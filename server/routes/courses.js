@@ -175,6 +175,65 @@ router.get('/quiz/:id', authenticateToken, (req, res) => {
   res.json(quizDetails);
 });
 
+// GET /api/courses/public/quizzes - Fetch list of all public quizzes/tests
+router.get('/public/quizzes', (req, res) => {
+  res.json(db.getQuizzes());
+});
+
+// GET /api/courses/public/quiz/:id - Fetch quiz details for public tests
+router.get('/public/quiz/:id', (req, res) => {
+  const quiz = db.getQuizById(req.params.id);
+  if (!quiz) {
+    return res.status(404).json({ message: 'Quiz not found.' });
+  }
+  // Remove correctOptionIndex from questions sent to public client
+  const quizDetails = {
+    id: quiz.id,
+    title: quiz.title,
+    questions: quiz.questions.map(q => ({
+      id: q.id,
+      questionText: q.questionText,
+      options: q.options
+    }))
+  };
+  res.json(quizDetails);
+});
+
+// POST /api/courses/public/quiz/:id/attempt - Submit quiz answers publicly without auth
+router.post('/public/quiz/:id/attempt', (req, res) => {
+  const quizId = req.params.id;
+  const { answers } = req.body;
+
+  if (!answers || !Array.isArray(answers)) {
+    return res.status(400).json({ message: 'Answers array is required.' });
+  }
+
+  const quiz = db.getQuizById(quizId);
+  if (!quiz) {
+    return res.status(404).json({ message: 'Quiz not found.' });
+  }
+
+  let score = 0;
+  const resultDetails = quiz.questions.map((q, idx) => {
+    const isCorrect = q.correctOptionIndex === answers[idx];
+    if (isCorrect) score++;
+    return {
+      questionText: q.questionText,
+      options: q.options,
+      correctIndex: q.correctOptionIndex,
+      submittedIndex: answers[idx],
+      isCorrect
+    };
+  });
+
+  res.json({
+    score,
+    totalQuestions: quiz.questions.length,
+    percentage: Math.round((score / quiz.questions.length) * 100),
+    details: resultDetails
+  });
+});
+
 // POST /api/quizzes/:id/attempt - Submit quiz answers
 router.post('/quiz/:id/attempt', authenticateToken, (req, res) => {
   const quizId = req.params.id;

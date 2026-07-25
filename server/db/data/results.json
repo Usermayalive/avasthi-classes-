@@ -1,0 +1,29 @@
+[
+  {
+    "id": "top-1",
+    "name": "Pooja Choudhary",
+    "exam": "RAS Exam 2023",
+    "rank": "Rank 04",
+    "year": "2023",
+    "photoUrl": "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&q=80&w=400",
+    "testimonial": "Avasthi Classes guided me thoroughly for RAS Mains answer writing. The test series was instrumental in my top rank!"
+  },
+  {
+    "id": "top-2",
+    "name": "Vikram Singh Rathore",
+    "exam": "REET Level-2",
+    "rank": "Rank 01 (State Topper)",
+    "year": "2024",
+    "photoUrl": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=400",
+    "testimonial": "The pedagogy guidance and daily offline quizzes gave me the confidence to secure State Rank 1."
+  },
+  {
+    "id": "top-3",
+    "name": "Rahul Sharma",
+    "exam": "Rajasthan Police Sub-Inspector",
+    "rank": "Rank 12",
+    "year": "2024",
+    "photoUrl": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=400",
+    "testimonial": "Best coaching institute in Rajasthan for competitive exam preparation. Dedicated faculty and structured notes."
+  }
+]

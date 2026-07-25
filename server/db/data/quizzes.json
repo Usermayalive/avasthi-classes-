@@ -1,44 +1,5 @@
 [
   {
-    "id": "q-rajasthan-history",
-    "title": "Rajasthan History & Dynasties Quiz",
-    "questions": [
-      {
-        "id": "q1",
-        "questionText": "Which famous Battle of Haldighati was fought in 1576 AD?",
-        "options": [
-          "Maharana Pratap and Akbar's army",
-          "Prithviraj Chauhan and Muhammad Ghori",
-          "Rana Sanga and Babur",
-          "Maldeo Rathore and Sher Shah Suri"
-        ],
-        "correctOptionIndex": 0
-      },
-      {
-        "id": "q2",
-        "questionText": "Who was the founder of the Mewar Dynasty?",
-        "options": [
-          "Bappa Rawal",
-          "Rana Hamir",
-          "Rana Kumbha",
-          "Rana Sanga"
-        ],
-        "correctOptionIndex": 0
-      },
-      {
-        "id": "q3",
-        "questionText": "The famous Kirti Stambha (Tower of Fame) at Chittorgarh was built by:",
-        "options": [
-          "Rana Kumbha",
-          "Rana Sanga",
-          "Rana Pratap",
-          "Rana Udai Singh"
-        ],
-        "correctOptionIndex": 0
-      }
-    ]
-  },
-  {
     "id": "q-rajasthan-geography",
     "title": "Geography of Rajasthan MCQ",
     "questions": [

@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { Award, CheckCircle, XCircle, RotateCcw, AlertTriangle, ChevronRight, BookOpen } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { Award, CheckCircle, XCircle, RotateCcw, AlertTriangle, ChevronRight, BookOpen, Clock } from 'lucide-react';
 
 export default function QuizPlayer({ quizId, onQuizCompleted }) {
   const [quiz, setQuiz] = useState(null);
@@ -9,10 +9,36 @@ export default function QuizPlayer({ quizId, onQuizCompleted }) {
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [isPublicQuiz, setIsPublicQuiz] = useState(false);
+
+  // Timer state
+  const [timeLeft, setTimeLeft] = useState(0);
+  const timerRef = useRef(null);
 
   useEffect(() => {
     fetchQuiz();
+    return () => {
+      if (timerRef.current) clearInterval(timerRef.current);
+    };
   }, [quizId]);
+
+  // Handle countdown logic
+  useEffect(() => {
+    if (submitted || timeLeft <= 0 || !quiz) return;
+
+    timerRef.current = setInterval(() => {
+      setTimeLeft((prev) => {
+        if (prev <= 1) {
+          clearInterval(timerRef.current);
+          handleAutoSubmit();
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    return () => clearInterval(timerRef.current);
+  }, [timeLeft, submitted, quiz]);
 
   const fetchQuiz = async () => {
     setLoading(true);
@@ -20,23 +46,35 @@ export default function QuizPlayer({ quizId, onQuizCompleted }) {
     setSubmitted(false);
     setResult(null);
     setCurrentIdx(0);
+    setIsPublicQuiz(false);
 
     try {
       const token = localStorage.getItem('token');
-      const res = await fetch(`/api/courses/quiz/${quizId}`, {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
-      if (!res.ok) {
-        if (res.status === 403) {
-          throw new Error('This quiz is locked. Subscribe to premium to unlock.');
-        }
-        throw new Error('Failed to load quiz details.');
+      let res;
+      
+      if (token) {
+        res = await fetch(`/api/courses/quiz/${quizId}`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
       }
-      const data = await res.json();
-      setQuiz(data);
-      setAnswers(new Array(data.questions.length).fill(null));
+
+      if (!token || !res.ok) {
+        // Fallback to public quiz fetching
+        const publicRes = await fetch(`/api/courses/public/quiz/${quizId}`);
+        if (!publicRes.ok) {
+          throw new Error('This quiz is locked or not found.');
+        }
+        const publicData = await publicRes.json();
+        setQuiz(publicData);
+        setAnswers(new Array(publicData.questions.length).fill(null));
+        setIsPublicQuiz(true);
+        setTimeLeft(publicData.questions.length * 45); // 45 seconds per question
+      } else {
+        const data = await res.json();
+        setQuiz(data);
+        setAnswers(new Array(data.questions.length).fill(null));
+        setTimeLeft(data.questions.length * 45);
+      }
     } catch (err) {
       console.error(err);
       setError(err.message || 'Error occurred loading quiz.');
@@ -47,31 +85,56 @@ export default function QuizPlayer({ quizId, onQuizCompleted }) {
 
   const handleSelectOption = (optIdx) => {
     if (submitted) return;
+
+    // Save selection
     const newAnswers = [...answers];
     newAnswers[currentIdx] = optIdx;
     setAnswers(newAnswers);
+
+    // Auto advance after 300ms delay to show feedback
+    setTimeout(() => {
+      if (currentIdx < quiz.questions.length - 1) {
+        setCurrentIdx(currentIdx + 1);
+      } else {
+        // Last question, submit test
+        handleSubmit(newAnswers);
+      }
+    }, 300);
   };
 
-  const handleSubmit = async () => {
-    // Validate that all questions are answered
-    if (answers.some(a => a === null)) {
-      setError('Please answer all questions before submitting.');
-      return;
-    }
+  // Called automatically when timer runs out
+  const handleAutoSubmit = () => {
+    alert("Time is up! Submitting your answers automatically for grading.");
+    handleSubmit();
+  };
 
+  const handleSubmit = async (answersToSubmit = answers) => {
     setError('');
     setLoading(true);
+    if (timerRef.current) clearInterval(timerRef.current);
 
     try {
       const token = localStorage.getItem('token');
-      const res = await fetch(`/api/courses/quiz/${quizId}/attempt`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify({ answers })
-      });
+      // Replace unselected indices with 0 to prevent grading errors
+      const sanitizedAnswers = answersToSubmit.map(a => a === null ? 0 : a);
+
+      let res;
+      if (isPublicQuiz || !token) {
+        res = await fetch(`/api/courses/public/quiz/${quizId}/attempt`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ answers: sanitizedAnswers })
+        });
+      } else {
+        res = await fetch(`/api/courses/quiz/${quizId}/attempt`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({ answers: sanitizedAnswers })
+        });
+      }
 
       if (!res.ok) {
         throw new Error('Failed to submit quiz attempt.');
@@ -89,6 +152,13 @@ export default function QuizPlayer({ quizId, onQuizCompleted }) {
     } finally {
       setLoading(false);
     }
+  };
+
+  // Format MM:SS
+  const formatTime = (seconds) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
   };
 
   if (loading) {
@@ -133,7 +203,7 @@ export default function QuizPlayer({ quizId, onQuizCompleted }) {
         }}>
           <AlertTriangle size={30} color="var(--danger)" />
         </div>
-        <h4 style={{ color: 'var(--primary-dark)', fontFamily: 'var(--font-title)', fontSize: '18px', fontWeight: '750', marginBottom: '10px' }}>Syllabus Module Locked</h4>
+        <h4 style={{ color: 'var(--primary-dark)', fontFamily: 'var(--font-title)', fontSize: '18px', fontWeight: '750', marginBottom: '10px' }}>Test Locked / Error</h4>
         <p style={{ color: 'var(--text-muted)', fontSize: '14px', marginBottom: '24px', lineHeight: '1.6', maxWidth: '340px', margin: '0 auto 24px auto' }}>{error}</p>
         <button onClick={fetchQuiz} className="btn btn-primary" style={{ padding: '10px 24px', borderRadius: '10px', fontSize: '13.5px' }}>Try Again</button>
       </div>
@@ -143,7 +213,7 @@ export default function QuizPlayer({ quizId, onQuizCompleted }) {
   if (submitted && result) {
     const isPassing = result.percentage >= 50;
     return (
-      <div className="quiz-card">
+      <div className="quiz-card" style={{ backgroundColor: '#ffffff', border: '1px solid var(--border-color)', borderRadius: '20px', padding: '32px', boxShadow: 'var(--shadow-lg)' }}>
         <div style={{ textAlign: 'center', marginBottom: '36px', borderBottom: '1px solid var(--border-color)', paddingBottom: '32px' }}>
           <div style={{
             width: '76px',
@@ -182,13 +252,6 @@ export default function QuizPlayer({ quizId, onQuizCompleted }) {
           }}>
             {result.percentage}% • {isPassing ? 'PASSED' : 'RETAKE NEEDED'}
           </div>
-          <p style={{ color: 'var(--text-muted)', fontSize: '14.5px', marginTop: '16px', maxWidth: '400px', margin: '16px auto 0 auto', lineHeight: '1.6' }}>
-            {result.percentage >= 80 
-              ? 'Outstanding score! You have completely mastered this chapter curriculum.' 
-              : result.percentage >= 50 
-              ? 'Clear pass. Review the revision PDF formula sheets to secure a perfect score.' 
-              : 'Score is below qualifying criteria. Review the chapter lecture and retake.'}
-          </p>
         </div>
 
         {/* Detailed Correction list */}
@@ -242,23 +305,29 @@ export default function QuizPlayer({ quizId, onQuizCompleted }) {
   const currentQuestion = quiz.questions[currentIdx];
 
   return (
-    <div className="quiz-card" style={{ animation: 'fadeInUp 0.3s ease-out' }}>
-      {/* Header bar progress */}
+    <div className="quiz-card" style={{ animation: 'fadeInUp 0.3s ease-out', backgroundColor: '#ffffff', border: '1px solid var(--border-color)', borderRadius: '20px', padding: '32px', boxShadow: 'var(--shadow-lg)' }}>
+      {/* Header bar with ticking countdown timer */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px', borderBottom: '1px solid var(--border-color)', paddingBottom: '16px' }}>
         <div>
-          <span style={{ fontSize: '11px', color: 'var(--secondary)', fontWeight: '800', textTransform: 'uppercase', letterSpacing: '1px' }}>KNOWLEDGE CHECK</span>
+          <span style={{ fontSize: '11px', color: 'var(--secondary)', fontWeight: '800', textTransform: 'uppercase', letterSpacing: '1px' }}>KNOWLEDGE DIAGNOSTIC TEST</span>
           <h4 style={{ fontSize: '16.5px', fontFamily: 'var(--font-title)', color: 'var(--primary-dark)', fontWeight: '750', marginTop: '2px' }}>{quiz.title}</h4>
         </div>
-        <span style={{ 
-          fontSize: '12.5px', 
-          color: 'var(--text-muted)', 
-          fontWeight: '700',
-          backgroundColor: 'hsl(210, 40%, 96%)',
-          padding: '4px 12px',
-          borderRadius: '20px'
+        
+        {/* IIIT Pune style Countdown Timer */}
+        <div style={{ 
+          display: 'flex',
+          alignItems: 'center',
+          gap: '8px',
+          color: timeLeft < 30 ? 'var(--danger)' : 'var(--secondary)',
+          backgroundColor: timeLeft < 30 ? 'var(--danger-bg)' : 'var(--secondary-glow)',
+          padding: '6px 14px',
+          borderRadius: '50px',
+          fontWeight: '800',
+          fontSize: '14px'
         }}>
-          Question {currentIdx + 1} of {quiz.questions.length}
-        </span>
+          <Clock size={16} style={{ animation: timeLeft < 30 ? 'blinkGlow 1.2s infinite ease' : 'none' }} />
+          <span>{formatTime(timeLeft)}</span>
+        </div>
       </div>
 
       {error && (
@@ -282,7 +351,7 @@ export default function QuizPlayer({ quizId, onQuizCompleted }) {
         </h3>
       </div>
 
-      {/* Options grid */}
+      {/* Options grid (ticking auto-advances to next question) */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
         {currentQuestion.options.map((opt, oIdx) => {
           const isSelected = answers[currentIdx] === oIdx;
@@ -303,18 +372,6 @@ export default function QuizPlayer({ quizId, onQuizCompleted }) {
                 alignItems: 'center',
                 justifyContent: 'flex-start',
                 cursor: 'pointer'
-              }}
-              onMouseOver={e => {
-                if (!isSelected) {
-                  e.currentTarget.style.borderColor = 'var(--text-muted)';
-                  e.currentTarget.style.backgroundColor = 'hsl(210, 40%, 97%)';
-                }
-              }}
-              onMouseOut={e => {
-                if (!isSelected) {
-                  e.currentTarget.style.borderColor = 'var(--border-color)';
-                  e.currentTarget.style.backgroundColor = 'hsl(210, 40%, 99%)';
-                }
               }}
             >
               <div style={{ display: 'flex', gap: '12px', alignItems: 'center', width: '100%' }}>
@@ -340,39 +397,20 @@ export default function QuizPlayer({ quizId, onQuizCompleted }) {
         })}
       </div>
 
-      {/* Nav Actions */}
+      {/* Skip question info */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '36px', borderTop: '1px solid var(--border-color)', paddingTop: '24px' }}>
         <button
           type="button"
           onClick={() => setCurrentIdx(prev => Math.max(0, prev - 1))}
           className="btn btn-outline"
           disabled={currentIdx === 0}
-          style={{ opacity: currentIdx === 0 ? 0.4 : 1, pointerEvents: currentIdx === 0 ? 'none' : 'auto', padding: '10px 24px', borderRadius: '10px', fontSize: '13.5px', borderWidth: '1.5px' }}
+          style={{ opacity: currentIdx === 0 ? 0.4 : 1, pointerEvents: currentIdx === 0 ? 'none' : 'auto', padding: '10px 24px', borderRadius: '10px', fontSize: '13.5px' }}
         >
           Previous
         </button>
-
-        {currentIdx === quiz.questions.length - 1 ? (
-          <button
-            type="button"
-            onClick={handleSubmit}
-            className="btn btn-secondary"
-            style={{ padding: '12px 28px', borderRadius: '10px', fontSize: '14px' }}
-          >
-            <span>Finish & Grade</span>
-            <ChevronRight size={16} />
-          </button>
-        ) : (
-          <button
-            type="button"
-            onClick={() => setCurrentIdx(prev => Math.min(quiz.questions.length - 1, prev + 1))}
-            className="btn btn-primary"
-            style={{ padding: '12px 28px', borderRadius: '10px', fontSize: '14px' }}
-          >
-            <span>Next Question</span>
-            <ChevronRight size={16} />
-          </button>
-        )}
+        <span style={{ fontSize: '12.5px', color: 'var(--text-muted)', fontWeight: '600' }}>
+          Question {currentIdx + 1} of {quiz.questions.length}
+        </span>
       </div>
     </div>
   );

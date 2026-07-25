@@ -8,12 +8,32 @@ const courseRoutes = require('./routes/courses');
 const paymentRoutes = require('./routes/payments');
 const adminRoutes = require('./routes/admin');
 
+const db = require('./db/db');
+
 const app = express();
 const PORT = process.env.PORT || 5050;
 
 // Middleware
 app.use(cors());
-app.use(express.json());
+app.use(express.json({ limit: '25mb' }));
+app.use(express.urlencoded({ extended: true, limit: '25mb' }));
+
+// Static directory for uploaded flyers/images/PDFs
+const UPLOADS_DIR = path.join(__dirname, 'uploads');
+const fs = require('fs');
+if (!fs.existsSync(UPLOADS_DIR)) {
+  fs.mkdirSync(UPLOADS_DIR, { recursive: true });
+}
+app.use('/uploads', express.static(UPLOADS_DIR));
+
+// Public Promotions Endpoint (Flyers, Bulletins, Toppers)
+app.get('/api/public/promotions', (req, res) => {
+  res.json({
+    flyers: db.getFlyers(),
+    updates: db.getUpdates(),
+    results: db.getResults()
+  });
+});
 
 // API Route Bindings
 app.use('/api/auth', authRoutes);
@@ -26,7 +46,6 @@ const NOTES_DIR = path.join(__dirname, 'notes');
 app.use('/notes', express.static(NOTES_DIR));
 
 // Create mock notes files so download links don't throw 404
-const fs = require('fs');
 if (!fs.existsSync(NOTES_DIR)) {
   fs.mkdirSync(NOTES_DIR, { recursive: true });
 }

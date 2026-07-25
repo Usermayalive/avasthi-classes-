@@ -7,7 +7,7 @@ import {
   Play, Lock, FileText, CheckCircle, HelpCircle, 
   BookOpen, Video, Trash2, Edit3, Plus, UserCheck, 
   DollarSign, GraduationCap, Calendar, ExternalLink, 
-  ArrowRight, Shield, Award, Users, FileCheck, Layers
+  ArrowRight, Shield, Award, Users, FileCheck, Layers, LogOut
 } from 'lucide-react';
 
 export default function App() {
@@ -26,6 +26,29 @@ export default function App() {
   const [activeQuizId, setActiveQuizId] = useState(null);
   const [activePdfUrl, setActivePdfUrl] = useState(null);
 
+  // Promotional & Hero Carousel State
+  const [promotions, setPromotions] = useState({ flyers: [], updates: [], results: [] });
+  const [currentFlyerIndex, setCurrentFlyerIndex] = useState(0);
+
+  // Student Test Portal & Quizzes State
+  const [quizzesList, setQuizzesList] = useState([]);
+  const [activePracticeQuiz, setActivePracticeQuiz] = useState(null);
+
+  // Lead Capture Modal State
+  const [inquireModalCourse, setInquireModalCourse] = useState(null);
+  const [showInquireModal, setShowInquireModal] = useState(false);
+  const [inquireForm, setInquireForm] = useState({ name: '', phone: '', targetExam: 'RAS 2026', mode: 'Offline Classroom' });
+  const [inquireSubmitted, setInquireSubmitted] = useState(false);
+
+  // Admin Media & Quiz Management States
+  const [adminTab, setAdminTab] = useState('promotional'); // 'promotional', 'pdf_quiz', 'stats', 'courses', 'users'
+  const [flyerForm, setFlyerForm] = useState({ title: '', subtitle: '', badge: 'ADMISSIONS OPEN', targetExam: 'RAS', imageUrl: '', imageFile: null });
+  const [updateForm, setUpdateForm] = useState({ title: '', category: 'Schedule', date: '', description: '', isNew: true });
+  const [resultForm, setResultForm] = useState({ name: '', exam: 'RAS Exam 2024', rank: 'Rank 01', year: '2024', photoUrl: '', testimonial: '', photoFile: null });
+  const [pdfFile, setPdfFile] = useState(null);
+  const [pdfParsing, setPdfParsing] = useState(false);
+  const [pdfNotice, setPdfNotice] = useState('');
+
   // Overlay / Pop-up State
   const [paymentCourse, setPaymentCourse] = useState(null);
   const [upgradeMessage, setUpgradeMessage] = useState('');
@@ -39,28 +62,40 @@ export default function App() {
       const hash = window.location.hash || '#/';
       setCurrentPath(hash);
       
-      // Parse active course ID from hashes like #/course/c-class-9-science
       if (hash.startsWith('#/course/')) {
         const id = hash.replace('#/course/', '');
         setActiveCourseId(id);
+      } else if (hash.startsWith('#/test/')) {
+        const qId = hash.replace('#/test/', '');
+        setActivePracticeQuiz(qId);
       }
       
-      // Scroll back to top on page load
       window.scrollTo(0, 0);
     };
 
     window.addEventListener('hashchange', handleHashChange);
-    handleHashChange(); // trigger on load
+    handleHashChange();
 
     return () => window.removeEventListener('hashchange', handleHashChange);
   }, []);
 
-  // Fetch initial profile & catalog data
+  // Hero Flyer Carousel Auto-timer (5 seconds)
+  useEffect(() => {
+    if (!promotions.flyers || promotions.flyers.length === 0) return;
+    const timer = setInterval(() => {
+      setCurrentFlyerIndex(prev => (prev + 1) % promotions.flyers.length);
+    }, 5000);
+    return () => clearInterval(timer);
+  }, [promotions.flyers]);
+
+  // Fetch initial profile, catalog, promotions & public test quizzes
   useEffect(() => {
     const initializeData = async () => {
       setLoading(true);
       await fetchCourses();
       await fetchBlogs();
+      await fetchPromotions();
+      await fetchQuizzesList();
       if (token) {
         await verifySession(token);
         await fetchUserProgress();
@@ -69,6 +104,30 @@ export default function App() {
     };
     initializeData();
   }, [token]);
+
+  const fetchPromotions = async () => {
+    try {
+      const res = await fetch('/api/public/promotions');
+      if (res.ok) {
+        const data = await res.json();
+        setPromotions(data);
+      }
+    } catch (e) {
+      console.error('Failed to load promotions data', e);
+    }
+  };
+
+  const fetchQuizzesList = async () => {
+    try {
+      const res = await fetch('/api/courses/public/quizzes');
+      if (res.ok) {
+        const data = await res.json();
+        setQuizzesList(data);
+      }
+    } catch (e) {
+      console.error('Failed to load quizzes list', e);
+    }
+  };
 
   // Navigate utility
   const navigateTo = (hash) => {
@@ -162,14 +221,16 @@ export default function App() {
 
   // Auth Operations
   const handleLogin = (authToken, loggedUser) => {
+    localStorage.setItem('token', authToken);
     setToken(authToken);
     setUser(loggedUser);
-    localStorage.setItem('token', authToken);
-    if (loggedUser.role === 'admin') {
-      navigateTo('#/admin');
-    } else {
-      navigateTo('#/dashboard');
-    }
+    setTimeout(() => {
+      if (loggedUser.role === 'admin') {
+        navigateTo('#/admin');
+      } else {
+        navigateTo('#/dashboard');
+      }
+    }, 50);
   };
 
   const handleLogout = () => {
@@ -215,164 +276,269 @@ export default function App() {
      PAGES RENDER ROUTES
      ======================================================== */
   
-  // 1. Homepage
+  // 1. Homepage (Promotional Portal)
   const renderHome = () => {
+    const currentFlyer = promotions.flyers && promotions.flyers.length > 0 
+      ? promotions.flyers[currentFlyerIndex % promotions.flyers.length] 
+      : null;
+
     return (
       <div style={{ backgroundColor: 'var(--bg-main)', overflow: 'hidden' }}>
-        {/* ========== HERO SECTION ========== */}
+        {/* ========== FULL-WIDTH HERO FLYER CAROUSEL (IIIT PUNE ACADEMIC STYLE) ========== */}
         <section style={{
-          background: 'linear-gradient(135deg, var(--primary-dark) 0%, #0c1033 40%, #101545 70%, #171d5e 100%)',
-          backgroundSize: '200% 200%',
-          animation: 'gradientShift 10s ease infinite',
-          color: '#ffffff',
-          padding: '130px 0 110px 0',
           position: 'relative',
-          overflow: 'hidden'
+          height: '520px',
+          width: '100%',
+          overflow: 'hidden',
+          backgroundColor: '#0c1033'
         }}>
-          {/* Dynamic Floating Glow Blobs */}
-          <div style={{ 
-            position: 'absolute', 
-            top: '8%', 
-            left: '5%', 
-            width: '320px', 
-            height: '320px', 
-            borderRadius: '50%', 
-            background: 'radial-gradient(circle, rgba(249,115,22,0.15) 0%, transparent 70%)', 
-            filter: 'blur(40px)',
-            animation: 'float 7s ease-in-out infinite', 
-            pointerEvents: 'none' 
-          }}></div>
-          <div style={{ 
-            position: 'absolute', 
-            bottom: '12%', 
-            right: '8%', 
-            width: '360px', 
-            height: '360px', 
-            borderRadius: '50%', 
-            background: 'radial-gradient(circle, rgba(99,102,241,0.2) 0%, transparent 70%)', 
-            filter: 'blur(50px)',
-            animation: 'floatSlow 9s ease-in-out infinite', 
-            pointerEvents: 'none' 
-          }}></div>
-          
-          {/* Dot grid subtle mask overlay */}
-          <div style={{ 
-            position: 'absolute', 
-            top: 0, 
-            left: 0, 
-            right: 0, 
-            bottom: 0, 
-            opacity: 0.05, 
-            backgroundImage: 'radial-gradient(#ffffff 1.5px, transparent 1.5px)', 
-            backgroundSize: '28px 28px' 
-          }}></div>
+          {currentFlyer ? (
+            <div style={{ position: 'relative', width: '100%', height: '100%' }}>
+              {/* Slideshow image background - clean show with full brightness */}
+              <img 
+                src={currentFlyer.imageUrl} 
+                alt={currentFlyer.title} 
+                style={{ 
+                  width: '100%', 
+                  height: '100%', 
+                  objectFit: 'cover', 
+                  transition: 'opacity 0.6s ease-in-out'
+                }}
+              />
 
-          <div className="container" style={{ position: 'relative', zIndex: 2, textAlign: 'center', maxWidth: '960px' }}>
-            {/* Tag Badge */}
-            <div style={{ animation: 'fadeInUp 0.6s ease forwards', marginBottom: '32px' }}>
-              <span style={{
-                background: 'rgba(255, 255, 255, 0.08)',
-                backdropFilter: 'blur(8px)',
-                WebkitBackdropFilter: 'blur(8px)',
-                border: '1px solid rgba(255, 255, 255, 0.15)',
-                color: '#ffffff',
-                padding: '8px 24px',
-                borderRadius: '50px',
-                fontSize: '12px',
-                fontWeight: '700',
-                textTransform: 'uppercase',
-                letterSpacing: '2.5px',
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '8px',
-                boxShadow: '0 4px 15px rgba(0,0,0,0.1)'
+              {/* Slide dots and nav controls */}
+              <div style={{
+                position: 'absolute',
+                bottom: '30px',
+                left: '50%',
+                transform: 'translateX(-50%)',
+                zIndex: 10,
+                display: 'flex',
+                gap: '8px'
               }}>
-                <span style={{ width: '7px', height: '7px', borderRadius: '50%', backgroundColor: 'var(--secondary)', display: 'inline-block' }}></span>
-                Rajasthan's Trusted Academy Since 2016
-              </span>
+                {promotions.flyers.map((_, idx) => (
+                  <button
+                    key={idx}
+                    onClick={() => setCurrentFlyerIndex(idx)}
+                    style={{
+                      width: idx === currentFlyerIndex ? '28px' : '10px',
+                      height: '10px',
+                      borderRadius: '5px',
+                      backgroundColor: idx === currentFlyerIndex ? 'var(--secondary)' : 'rgba(255,255,255,0.4)',
+                      border: 'none',
+                      cursor: 'pointer',
+                      transition: 'all 0.3s ease'
+                    }}
+                    aria-label={`Show slide ${idx + 1}`}
+                  />
+                ))}
+              </div>
             </div>
-
-            {/* Main Headline */}
-            <h1 style={{
-              fontSize: '60px',
-              fontWeight: '900',
-              lineHeight: '1.15',
-              marginBottom: '28px',
-              fontFamily: 'var(--font-title)',
-              color: '#ffffff',
-              letterSpacing: '-0.02em',
-              animation: 'fadeInUp 0.8s ease forwards'
-            }}>
-              Your Gateway to <br />
-              <span className="gradient-text" style={{ 
-                background: 'linear-gradient(135deg, var(--secondary-light) 0%, #fdba74 50%, #fef08a 100%)', 
-                WebkitBackgroundClip: 'text', 
-                WebkitTextFillColor: 'transparent',
-                display: 'inline-block',
-                marginTop: '6px'
-              }}>
-                Rajasthan Government Jobs
-              </span>
-            </h1>
-
-            {/* Subtitle description */}
-            <p style={{
-              fontSize: '19.5px',
-              color: 'rgba(255, 255, 255, 0.85)',
-              lineHeight: '1.75',
-              maxWidth: '720px',
-              margin: '0 auto 48px auto',
-              animation: 'fadeInUp 1s ease forwards',
-              fontWeight: '400'
-            }}>
-              Expert-led syllabus coaching for <strong style={{ color: 'var(--secondary-light)', fontWeight: '700' }}>RAS, REET, Police SI, Patwar & CET</strong> exams. 
-              HD Video lectures, hand-written PDF notes, weekly webinars & mock grading tests.
-            </p>
-
-            {/* CTA action buttons */}
-            <div style={{ display: 'flex', gap: '16px', justifyContent: 'center', marginBottom: '72px', animation: 'fadeInUp 1.2s ease forwards' }}>
-              <button onClick={() => navigateTo('#/courses')} className="btn btn-secondary" style={{
-                padding: '18px 44px',
-                fontSize: '16.5px',
-                fontWeight: '700',
-                borderRadius: '16px'
-              }}>
-                <span>Explore syllabus Catalog</span>
-                <ArrowRight size={18} />
-              </button>
-              <button onClick={() => navigateTo('#/register')} className="btn btn-outline-white" style={{
-                padding: '18px 36px',
-                fontSize: '16.5px',
-                borderRadius: '16px',
-                borderWidth: '2px'
-              }}>
-                Start Free Demo
-              </button>
+          ) : (
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', color: '#ffffff' }}>
+              <div className="loading-spinner"></div>
             </div>
+          )}
+        </section>
 
-            {/* Stats Dashboard Grid */}
+        {/* ========== IIIT PUNE NOTICES & STUDENT TEST PORTAL (2-COLUMN GRID SECTION) ========== */}
+        <section id="notices-tests-section" style={{ padding: '60px 0', backgroundColor: 'var(--bg-main)' }}>
+          <div className="container">
             <div style={{
               display: 'grid',
-              gridTemplateColumns: 'repeat(4, 1fr)',
-              gap: '24px',
-              animation: 'fadeInUp 1.4s ease forwards'
+              gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
+              gap: '36px',
+              alignItems: 'start'
             }}>
-              {[
-                { num: '10+', label: 'Years Mentoring' },
-                { num: '10K+', label: 'Students Guided' },
-                { num: '500+', label: 'Final Selections' },
-                { num: '98.8%', label: 'Success Rate' }
-              ].map((s, i) => (
-                <div key={i} className="stat-card" style={{
-                  background: 'rgba(255, 255, 255, 0.04)',
-                  border: '1px solid rgba(255, 255, 255, 0.1)',
-                  borderRadius: '16px',
-                  padding: '24px 16px'
+              
+              {/* COLUMN 1: IIIT PUNE STYLE ACADEMIC NOTICE BOARD */}
+              <div className="glass" style={{
+                backgroundColor: '#ffffff',
+                borderRadius: '24px',
+                border: '1px solid var(--border-color)',
+                padding: '24px',
+                boxShadow: 'var(--shadow-md)',
+                display: 'flex',
+                flexDirection: 'column',
+                maxHeight: '520px'
+              }}>
+                <div style={{ 
+                  display: 'flex', 
+                  justifyContent: 'space-between', 
+                  alignItems: 'center', 
+                  paddingBottom: '16px', 
+                  borderBottom: '2px solid var(--border-color)', 
+                  marginBottom: '16px' 
                 }}>
-                  <div style={{ fontSize: '32px', fontWeight: '900', color: 'var(--secondary-light)', fontFamily: 'var(--font-title)' }}>{s.num}</div>
-                  <div style={{ fontSize: '12px', color: 'rgba(255, 255, 255, 0.7)', marginTop: '8px', textTransform: 'uppercase', letterSpacing: '1px', fontWeight: '600' }}>{s.label}</div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <div style={{ width: '10px', height: '10px', borderRadius: '50%', backgroundColor: '#ef4444', animation: 'blinkGlow 1.5s infinite ease-in-out' }}></div>
+                    <h3 style={{ fontSize: '18px', fontWeight: '800', color: 'var(--primary-dark)', fontFamily: 'var(--font-title)' }}>
+                      Announcements & Notice Board
+                    </h3>
+                  </div>
+                  <span style={{ fontSize: '11px', color: 'var(--secondary)', fontWeight: '800', textTransform: 'uppercase' }}>
+                    Academic Info
+                  </span>
                 </div>
-              ))}
+
+                {/* News bulletin scrollable container */}
+                <div style={{ overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '14px', flexGrow: 1, paddingRight: '4px' }}>
+                  {promotions.updates && promotions.updates.length > 0 ? (
+                    promotions.updates.map((item) => (
+                      <div key={item.id} className="bulletin-item" style={{ cursor: 'pointer' }} onClick={() => alert(item.title + '\n\n' + item.description)}>
+                        <div className="bulletin-date-card">
+                          <div className="day-month">{item.date}</div>
+                          <div className="year">{item.year || '2026'}</div>
+                        </div>
+
+                        <div style={{ flexGrow: 1 }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
+                            {item.isNew && <span className="new-badge-glow">NEW</span>}
+                            <span style={{ fontSize: '10px', fontWeight: '800', backgroundColor: 'rgba(26,35,126,0.06)', color: 'var(--primary)', padding: '2px 8px', borderRadius: '4px' }}>
+                              {item.category || 'General'}
+                            </span>
+                          </div>
+                          <h4 style={{ fontSize: '14.5px', fontWeight: '700', color: 'var(--primary-dark)', lineHeight: '1.3' }}>
+                            {item.title}
+                          </h4>
+                          <p style={{ fontSize: '12.5px', color: 'var(--text-muted)', marginTop: '4px', lineHeight: '1.4' }}>
+                            {item.description}
+                          </p>
+                        </div>
+                      </div>
+                    ))
+                  ) : (
+                    <div style={{ textAlign: 'center', padding: '30px', color: 'var(--text-muted)' }}>
+                      No notices posted recently.
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* COLUMN 2: INTERACTIVE PRACTICE TESTS PORTAL (RICH EXAM MODULES) */}
+              <div className="glass" style={{
+                backgroundColor: '#ffffff',
+                borderRadius: '24px',
+                border: '1px solid var(--border-color)',
+                padding: '24px',
+                boxShadow: 'var(--shadow-md)',
+                display: 'flex',
+                flexDirection: 'column',
+                maxHeight: '520px'
+              }}>
+                <div style={{ 
+                  display: 'flex', 
+                  justifyContent: 'space-between', 
+                  alignItems: 'center', 
+                  paddingBottom: '16px', 
+                  borderBottom: '2px solid var(--border-color)', 
+                  marginBottom: '16px' 
+                }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <span style={{ fontSize: '18px' }}>📝</span>
+                    <h3 style={{ fontSize: '18px', fontWeight: '800', color: 'var(--primary-dark)', fontFamily: 'var(--font-title)' }}>
+                      Online Mock Tests & Quizzes
+                    </h3>
+                  </div>
+                  <span style={{ fontSize: '10px', color: 'var(--success)', fontWeight: '800', textTransform: 'uppercase' }}>
+                    Free Portal
+                  </span>
+                </div>
+
+                {/* Quizzes list container */}
+                <div style={{ overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '14px', flexGrow: 1, paddingRight: '4px' }}>
+                  {quizzesList && quizzesList.length > 0 ? (
+                    quizzesList.slice(0, 4).map((q) => (
+                      <div key={q.id} style={{
+                        padding: '16px',
+                        border: '1px solid var(--border-color)',
+                        borderRadius: '16px',
+                        backgroundColor: '#fafafa',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        justifyContent: 'space-between',
+                        gap: '12px',
+                        transition: 'transform 0.2s ease'
+                      }}
+                      onMouseOver={e => e.currentTarget.style.transform = 'scale(1.01)'}
+                      onMouseOut={e => e.currentTarget.style.transform = 'scale(1)'}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                          <h4 style={{ fontSize: '14.5px', fontWeight: '800', color: 'var(--primary-dark)', lineHeight: '1.3' }}>
+                            {q.title}
+                          </h4>
+                          <span style={{ fontSize: '11px', color: 'var(--secondary)', fontWeight: '700', whiteSpace: 'nowrap' }}>
+                            {q.questions ? `${q.questions.length} MCQs` : 'Practice Test'}
+                          </span>
+                        </div>
+                        
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                          <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>
+                            {q.sourcePdf ? '📄 Created from PDF paper' : '💻 Digital Mock Test'}
+                          </span>
+                          <button 
+                            onClick={() => {
+                              setActivePracticeQuiz(q.id);
+                              navigateTo(`#/test/${q.id}`);
+                            }}
+                            className="btn btn-secondary"
+                            style={{ padding: '6px 14px', fontSize: '12px', borderRadius: '6px' }}
+                          >
+                            Start Test
+                          </button>
+                        </div>
+                      </div>
+                    ))
+                  ) : (
+                    <div style={{ textAlign: 'center', padding: '30px', color: 'var(--text-muted)' }}>
+                      No mock tests available currently.
+                    </div>
+                  )}
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </section>
+
+        {/* ========== TOPPERS HALL OF FAME GRID ========== */}
+        <section style={{ padding: '60px 0', backgroundColor: '#ffffff', borderBottom: '1px solid var(--border-color)' }}>
+          <div className="container">
+            <div style={{ textAlign: 'center', marginBottom: '40px' }}>
+              <span style={{ color: 'var(--secondary)', fontSize: '12px', fontWeight: '800', textTransform: 'uppercase', letterSpacing: '1.5px' }}>
+                HALL OF FAME & RESULTS
+              </span>
+              <h2 style={{ fontSize: '32px', fontWeight: '900', color: 'var(--primary-dark)', marginTop: '6px' }}>
+                Our Star Performers & State Toppers
+              </h2>
+              <p style={{ fontSize: '15px', color: 'var(--text-muted)', marginTop: '8px', maxWidth: '600px', margin: '8px auto 0 auto' }}>
+                Empowering students across Rajasthan to achieve top ranks in RAS, REET, Police, and Patwar examinations.
+              </p>
+            </div>
+
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+              gap: '24px'
+            }}>
+              {promotions.results && promotions.results.length > 0 ? (
+                promotions.results.map((top) => (
+                  <div key={top.id} className="topper-card">
+                    <img src={top.photoUrl} alt={top.name} className="topper-avatar" />
+                    <div>
+                      <span className="rank-badge">{top.rank}</span>
+                      <h3 style={{ fontSize: '18px', fontWeight: '800', color: 'var(--primary-dark)' }}>{top.name}</h3>
+                      <div style={{ fontSize: '13px', color: 'var(--primary)', fontWeight: '700', marginTop: '2px' }}>{top.exam} ({top.year})</div>
+                      <p style={{ fontSize: '13px', color: 'var(--text-muted)', marginTop: '12px', fontStyle: 'italic', lineHeight: '1.5' }}>
+                        "{top.testimonial}"
+                      </p>
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <div style={{ gridColumn: '1/-1', textAlign: 'center', color: 'var(--text-muted)', padding: '20px' }}>
+                  Loading Toppers Data...
+                </div>
+              )}
             </div>
           </div>
         </section>
@@ -2175,7 +2341,207 @@ export default function App() {
     }
   };
 
+  // Admin CRM helper - create flyer
+  const handleCreateFlyerSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const formData = new FormData();
+      formData.append('title', flyerForm.title);
+      formData.append('subtitle', flyerForm.subtitle);
+      formData.append('badge', flyerForm.badge);
+      formData.append('targetExam', flyerForm.targetExam);
+      formData.append('imageUrl', flyerForm.imageUrl);
+      if (flyerForm.imageFile) {
+        formData.append('imageFile', flyerForm.imageFile);
+      }
+
+      const res = await fetch('/api/admin/promotions/flyer', {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${token}` },
+        body: formData
+      });
+      if (res.ok) {
+        alert('Flyer/banner uploaded successfully!');
+        setFlyerForm({ title: '', subtitle: '', badge: 'ADMISSIONS OPEN', targetExam: 'RAS', imageUrl: '', imageFile: null });
+        fetchPromotions();
+      } else {
+        const err = await res.json();
+        alert('Error uploading flyer: ' + err.message);
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  // Admin CRM helper - delete flyer
+  const handleDeleteFlyer = async (flyerId) => {
+    if (!confirm('Are you sure you want to delete this flyer banner?')) return;
+    try {
+      const res = await fetch(`/api/admin/promotions/flyer/${flyerId}`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (res.ok) {
+        fetchPromotions();
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  // Admin CRM helper - create news update
+  const handleCreateUpdateSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const res = await fetch('/api/admin/promotions/update', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(updateForm)
+      });
+      if (res.ok) {
+        alert('News announcement posted successfully!');
+        setUpdateForm({ title: '', category: 'Schedule', date: '', description: '', isNew: true });
+        fetchPromotions();
+      } else {
+        const err = await res.json();
+        alert('Error posting update: ' + err.message);
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  // Admin CRM helper - delete news update
+  const handleDeleteUpdate = async (updateId) => {
+    if (!confirm('Are you sure you want to delete this news update?')) return;
+    try {
+      const res = await fetch(`/api/admin/promotions/update/${updateId}`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (res.ok) {
+        fetchPromotions();
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  // Admin CRM helper - create topper result
+  const handleCreateResultSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const formData = new FormData();
+      formData.append('name', resultForm.name);
+      formData.append('exam', resultForm.exam);
+      formData.append('rank', resultForm.rank);
+      formData.append('year', resultForm.year);
+      formData.append('testimonial', resultForm.testimonial);
+      formData.append('photoUrl', resultForm.photoUrl);
+      if (resultForm.photoFile) {
+        formData.append('photoFile', resultForm.photoFile);
+      }
+
+      const res = await fetch('/api/admin/promotions/result', {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${token}` },
+        body: formData
+      });
+      if (res.ok) {
+        alert('Topper record saved successfully!');
+        setResultForm({ name: '', exam: 'RAS Exam 2024', rank: 'Rank 01', year: '2024', photoUrl: '', testimonial: '', photoFile: null });
+        fetchPromotions();
+      } else {
+        const err = await res.json();
+        alert('Error saving topper: ' + err.message);
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  // Admin CRM helper - delete topper result
+  const handleDeleteResult = async (resId) => {
+    if (!confirm('Are you sure you want to delete this topper record?')) return;
+    try {
+      const res = await fetch(`/api/admin/promotions/result/${resId}`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (res.ok) {
+        fetchPromotions();
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  // Admin CRM helper - submit PDF to parse as Quiz
+  const handlePdfQuizSubmit = async (e) => {
+    e.preventDefault();
+    if (!pdfFile) {
+      alert('Please select a PDF file first.');
+      return;
+    }
+    setPdfParsing(true);
+    setPdfNotice('');
+    try {
+      const formData = new FormData();
+      formData.append('pdfFile', pdfFile);
+
+      const res = await fetch('/api/admin/parse-quiz-pdf', {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${token}` },
+        body: formData
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setPdfNotice('SUCCESS: Quiz generated successfully!');
+        setPdfFile(null);
+        fetchQuizzesList();
+        loadAdminWorkspace();
+      } else {
+        const err = await res.json();
+        setPdfNotice('ERROR: ' + err.message);
+      }
+    } catch (err) {
+      console.error(err);
+      setPdfNotice('ERROR: ' + err.message);
+    } finally {
+      setPdfParsing(false);
+    }
+  };
+
+  // Admin CRM helper - delete quiz
+  const handleDeleteQuiz = async (qId) => {
+    if (!confirm('Are you sure you want to delete this quiz test module?')) return;
+    try {
+      const res = await fetch(`/api/admin/quizzes/${qId}`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (res.ok) {
+        fetchQuizzesList();
+        loadAdminWorkspace();
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
   const renderAdminLayout = (contentNode, activeTab) => {
+    if (!user && localStorage.getItem('token')) {
+      return (
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '300px' }}>
+          <div className="loading-spinner"></div>
+          <div style={{ marginTop: '16px', color: 'var(--text-muted)', fontSize: '14px' }}>Authenticating Admin Workspace...</div>
+        </div>
+      );
+    }
+
     if (!user || user.role !== 'admin') {
       navigateTo('#/login');
       return null;
@@ -2245,6 +2611,8 @@ export default function App() {
             </div>
 
             <AdminSidebarBtn tab="stats" icon={<Layers size={16} />} label="General Stats" onClick={() => navigateTo('#/admin')} />
+            <AdminSidebarBtn tab="promotions" icon={<Edit3 size={16} />} label="Flyers & Bulletins" onClick={() => navigateTo('#/admin/promotions')} />
+            <AdminSidebarBtn tab="pdf_quiz" icon={<FileText size={16} />} label="AI PDF Quiz Parser" onClick={() => navigateTo('#/admin/pdf-quiz')} />
             <AdminSidebarBtn tab="courses" icon={<BookOpen size={16} />} label="Syllabus Builder" onClick={() => navigateTo('#/admin/courses')} />
             <AdminSidebarBtn tab="users" icon={<Users size={16} />} label="Registered Students" onClick={() => navigateTo('#/admin/users')} />
             <AdminSidebarBtn tab="payments" icon={<DollarSign size={16} />} label="Transaction Invoices" onClick={() => navigateTo('#/admin/payments')} />
@@ -2643,6 +3011,452 @@ export default function App() {
     );
   };
 
+  // Admin Flyers, Bulletins & Showcase Manager
+  const renderAdminPromotions = () => {
+    return renderAdminLayout(
+      <div style={{ animation: 'fadeInUp 0.4s ease', display: 'flex', flexDirection: 'column', gap: '36px' }}>
+        
+        {/* SECTION 1: FLYERS MANAGER */}
+        <div className="glass" style={{ backgroundColor: '#ffffff', padding: '28px', borderRadius: '16px', border: '1px solid var(--border-color)', boxShadow: 'var(--shadow-sm)' }}>
+          <h3 style={{ fontFamily: 'var(--font-title)', color: 'var(--primary-dark)', fontSize: '18px', fontWeight: '750', marginBottom: '20px', borderBottom: '1px solid var(--border-color)', paddingBottom: '10px' }}>
+            🖼️ Homepage Flyer Carousel Banners
+          </h3>
+          
+          <form onSubmit={handleCreateFlyerSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px', marginBottom: '28px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+              <div className="form-group">
+                <label className="form-label">Flyer Title / Headline</label>
+                <input 
+                  type="text" 
+                  className="form-input" 
+                  placeholder="e.g. RAS 2026 Foundation Batch" 
+                  required 
+                  value={flyerForm.title} 
+                  onChange={e => setFlyerForm({ ...flyerForm, title: e.target.value })} 
+                />
+              </div>
+              <div className="form-group">
+                <label className="form-label">Subtitle / Key Offer</label>
+                <input 
+                  type="text" 
+                  className="form-input" 
+                  placeholder="e.g. Offline batches start 1st Aug. Enroll today!" 
+                  required 
+                  value={flyerForm.subtitle} 
+                  onChange={e => setFlyerForm({ ...flyerForm, subtitle: e.target.value })} 
+                />
+              </div>
+            </div>
+
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '16px' }}>
+              <div className="form-group">
+                <label className="form-label">Badge Ribbon Tag</label>
+                <input 
+                  type="text" 
+                  className="form-input" 
+                  placeholder="e.g. ADMISSIONS OPEN" 
+                  required 
+                  value={flyerForm.badge} 
+                  onChange={e => setFlyerForm({ ...flyerForm, badge: e.target.value })} 
+                />
+              </div>
+              <div className="form-group">
+                <label className="form-label">Target Exam Group</label>
+                <input 
+                  type="text" 
+                  className="form-input" 
+                  placeholder="e.g. RAS / REET / SI" 
+                  required 
+                  value={flyerForm.targetExam} 
+                  onChange={e => setFlyerForm({ ...flyerForm, targetExam: e.target.value })} 
+                />
+              </div>
+              <div className="form-group">
+                <label className="form-label">Or Image URL</label>
+                <input 
+                  type="text" 
+                  className="form-input" 
+                  placeholder="e.g. https://images.unsplash.com/..." 
+                  value={flyerForm.imageUrl} 
+                  onChange={e => setFlyerForm({ ...flyerForm, imageUrl: e.target.value })} 
+                />
+              </div>
+            </div>
+
+            <div className="form-group">
+              <label className="form-label">Upload Image Banner File</label>
+              <input 
+                type="file" 
+                accept="image/*" 
+                onChange={e => setFlyerForm({ ...flyerForm, imageFile: e.target.files[0] })} 
+              />
+            </div>
+
+            <button type="submit" className="btn btn-secondary" style={{ alignSelf: 'flex-start', padding: '10px 24px', borderRadius: '10px', fontSize: '13.5px' }}>
+              Upload Flyer Banner
+            </button>
+          </form>
+
+          {/* Flyers List */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '16px' }}>
+            {promotions.flyers && promotions.flyers.map(f => (
+              <div key={f.id} style={{ border: '1px solid var(--border-color)', borderRadius: '12px', overflow: 'hidden', backgroundColor: '#fafafa', position: 'relative' }}>
+                <img src={f.imageUrl} alt={f.title} style={{ width: '100%', height: '140px', objectFit: 'cover' }} />
+                <div style={{ padding: '14px' }}>
+                  <span style={{ fontSize: '9px', backgroundColor: 'var(--secondary)', color: '#fff', padding: '2px 6px', borderRadius: '4px', fontWeight: '800' }}>{f.badge}</span>
+                  <h4 style={{ fontSize: '14px', fontWeight: '750', color: 'var(--primary-dark)', marginTop: '6px' }}>{f.title}</h4>
+                  <p style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '4px' }}>{f.subtitle}</p>
+                  <button onClick={() => handleDeleteFlyer(f.id)} className="btn btn-outline" style={{ marginTop: '12px', color: '#dc2626', borderColor: '#fecaca', padding: '6px 12px', fontSize: '12px', borderRadius: '6px', width: '100%' }}>
+                    Remove Banner
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* SECTION 2: BULLETINS MANAGER */}
+        <div className="glass" style={{ backgroundColor: '#ffffff', padding: '28px', borderRadius: '16px', border: '1px solid var(--border-color)', boxShadow: 'var(--shadow-sm)' }}>
+          <h3 style={{ fontFamily: 'var(--font-title)', color: 'var(--primary-dark)', fontSize: '18px', fontWeight: '750', marginBottom: '20px', borderBottom: '1px solid var(--border-color)', paddingBottom: '10px' }}>
+            📢 Academic Notices & Rolling Bulletins
+          </h3>
+
+          <form onSubmit={handleCreateUpdateSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px', marginBottom: '28px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr', gap: '16px' }}>
+              <div className="form-group">
+                <label className="form-label">Notice Headline</label>
+                <input 
+                  type="text" 
+                  className="form-input" 
+                  placeholder="e.g. RAS Prelims 2026 Test Schedule Released" 
+                  required 
+                  value={updateForm.title} 
+                  onChange={e => setUpdateForm({ ...updateForm, title: e.target.value })} 
+                />
+              </div>
+              <div className="form-group">
+                <label className="form-label">Date (e.g. 25 Jul)</label>
+                <input 
+                  type="text" 
+                  className="form-input" 
+                  placeholder="e.g. 25 Jul" 
+                  required 
+                  value={updateForm.date} 
+                  onChange={e => setUpdateForm({ ...updateForm, date: e.target.value })} 
+                />
+              </div>
+              <div className="form-group">
+                <label className="form-label">Category</label>
+                <select 
+                  className="form-input" 
+                  value={updateForm.category} 
+                  onChange={e => setUpdateForm({ ...updateForm, category: e.target.value })}
+                >
+                  <option value="Schedule">Schedule</option>
+                  <option value="Seminar">Seminar</option>
+                  <option value="Scholarship">Scholarship</option>
+                  <option value="Admissions">Admissions</option>
+                </select>
+              </div>
+            </div>
+
+            <div className="form-group">
+              <label className="form-label">Detailed Notice Text</label>
+              <textarea 
+                className="form-input" 
+                rows="3" 
+                placeholder="Full details of notice goes here..." 
+                required 
+                value={updateForm.description} 
+                onChange={e => setUpdateForm({ ...updateForm, description: e.target.value })}
+              />
+            </div>
+
+            <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+              <input 
+                type="checkbox" 
+                id="isNew" 
+                checked={updateForm.isNew} 
+                onChange={e => setUpdateForm({ ...updateForm, isNew: e.target.checked })} 
+              />
+              <label htmlFor="isNew" style={{ fontSize: '13px', fontWeight: '600', color: 'var(--text-main)' }}>Show Glowing "NEW" Badge</label>
+            </div>
+
+            <button type="submit" className="btn btn-secondary" style={{ alignSelf: 'flex-start', padding: '10px 24px', borderRadius: '10px', fontSize: '13.5px' }}>
+              Post Announcement Notice
+            </button>
+          </form>
+
+          {/* Notices List */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+            {promotions.updates && promotions.updates.map(u => (
+              <div key={u.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '16px', border: '1px solid var(--border-color)', borderRadius: '12px', backgroundColor: '#fafafa' }}>
+                <div>
+                  <span style={{ fontSize: '10px', fontWeight: '800', color: 'var(--primary)', backgroundColor: 'rgba(26,35,126,0.06)', padding: '2px 8px', borderRadius: '4px', marginRight: '8px' }}>
+                    {u.category}
+                  </span>
+                  {u.isNew && <span style={{ fontSize: '10px', fontWeight: '800', color: 'var(--secondary)', marginRight: '8px' }}>[NEW]</span>}
+                  <strong style={{ fontSize: '14px', color: 'var(--primary-dark)' }}>{u.title} ({u.date})</strong>
+                  <p style={{ fontSize: '12.5px', color: 'var(--text-muted)', marginTop: '4px' }}>{u.description}</p>
+                </div>
+                <button onClick={() => handleDeleteUpdate(u.id)} className="btn btn-outline" style={{ color: '#dc2626', borderColor: '#fecaca', padding: '6px 12px', fontSize: '12px', borderRadius: '6px' }}>
+                  Delete
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* SECTION 3: TOPPERS MANAGER */}
+        <div className="glass" style={{ backgroundColor: '#ffffff', padding: '28px', borderRadius: '16px', border: '1px solid var(--border-color)', boxShadow: 'var(--shadow-sm)' }}>
+          <h3 style={{ fontFamily: 'var(--font-title)', color: 'var(--primary-dark)', fontSize: '18px', fontWeight: '750', marginBottom: '20px', borderBottom: '1px solid var(--border-color)', paddingBottom: '10px' }}>
+            🎓 Toppers Selections & Results Highlights
+          </h3>
+
+          <form onSubmit={handleCreateResultSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px', marginBottom: '28px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '16px' }}>
+              <div className="form-group">
+                <label className="form-label">Topper Name</label>
+                <input 
+                  type="text" 
+                  className="form-input" 
+                  placeholder="e.g. Vikram Singh" 
+                  required 
+                  value={resultForm.name} 
+                  onChange={e => setResultForm({ ...resultForm, name: e.target.value })} 
+                />
+              </div>
+              <div className="form-group">
+                <label className="form-label">Exam Name</label>
+                <input 
+                  type="text" 
+                  className="form-input" 
+                  placeholder="e.g. RAS Pre & Mains" 
+                  required 
+                  value={resultForm.exam} 
+                  onChange={e => setResultForm({ ...resultForm, exam: e.target.value })} 
+                />
+              </div>
+              <div className="form-group">
+                <label className="form-label">Rank / Distinction</label>
+                <input 
+                  type="text" 
+                  className="form-input" 
+                  placeholder="e.g. State Rank 01" 
+                  required 
+                  value={resultForm.rank} 
+                  onChange={e => setResultForm({ ...resultForm, rank: e.target.value })} 
+                />
+              </div>
+            </div>
+
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '16px' }}>
+              <div className="form-group">
+                <label className="form-label">Selection Year</label>
+                <input 
+                  type="text" 
+                  className="form-input" 
+                  placeholder="e.g. 2024" 
+                  required 
+                  value={resultForm.year} 
+                  onChange={e => setResultForm({ ...resultForm, year: e.target.value })} 
+                />
+              </div>
+              <div className="form-group">
+                <label className="form-label">Or Image URL</label>
+                <input 
+                  type="text" 
+                  className="form-input" 
+                  placeholder="e.g. https://images.unsplash.com/..." 
+                  value={resultForm.photoUrl} 
+                  onChange={e => setResultForm({ ...resultForm, photoUrl: e.target.value })} 
+                />
+              </div>
+              <div className="form-group">
+                <label className="form-label">Upload Photo File</label>
+                <input 
+                  type="file" 
+                  accept="image/*" 
+                  onChange={e => setResultForm({ ...resultForm, photoFile: e.target.files[0] })} 
+                />
+              </div>
+            </div>
+
+            <div className="form-group">
+              <label className="form-label">Student Testimonial Quote</label>
+              <textarea 
+                className="form-input" 
+                rows="2" 
+                placeholder="Avasthi Classes guide was instrumental in my success..." 
+                required 
+                value={resultForm.testimonial} 
+                onChange={e => setResultForm({ ...resultForm, testimonial: e.target.value })}
+              />
+            </div>
+
+            <button type="submit" className="btn btn-secondary" style={{ alignSelf: 'flex-start', padding: '10px 24px', borderRadius: '10px', fontSize: '13.5px' }}>
+              Add Selection Topper
+            </button>
+          </form>
+
+          {/* Toppers list */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '16px' }}>
+            {promotions.results && promotions.results.map(top => (
+              <div key={top.id} style={{ display: 'flex', gap: '14px', padding: '14px', border: '1px solid var(--border-color)', borderRadius: '12px', backgroundColor: '#fafafa', alignItems: 'center' }}>
+                <img src={top.photoUrl} alt={top.name} style={{ width: '64px', height: '64px', borderRadius: '50%', objectFit: 'cover', border: '2px solid var(--secondary)' }} />
+                <div style={{ flexGrow: 1 }}>
+                  <span style={{ fontSize: '9px', backgroundColor: 'var(--primary-glow)', color: 'var(--primary)', padding: '2px 6px', borderRadius: '4px', fontWeight: '800' }}>{top.rank}</span>
+                  <h4 style={{ fontSize: '14px', fontWeight: '750', color: 'var(--primary-dark)', marginTop: '4px' }}>{top.name}</h4>
+                  <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>{top.exam} ({top.year})</div>
+                </div>
+                <button onClick={() => handleDeleteResult(top.id)} className="btn btn-outline" style={{ color: '#dc2626', borderColor: '#fecaca', padding: '6px 10px', fontSize: '11px', borderRadius: '6px' }}>
+                  Delete
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
+
+      </div>,
+      'promotions'
+    );
+  };
+
+  // Admin AI PDF Ingestion & Online Quiz parser
+  const renderAdminPdfQuiz = () => {
+    return renderAdminLayout(
+      <div style={{ animation: 'fadeInUp 0.4s ease', display: 'flex', flexDirection: 'column', gap: '30px' }}>
+        
+        {/* PDF Ingestor Panel */}
+        <div className="glass" style={{ backgroundColor: '#ffffff', padding: '32px', borderRadius: '20px', border: '1px solid var(--border-color)', boxShadow: 'var(--shadow-sm)' }}>
+          <h3 style={{ fontFamily: 'var(--font-title)', color: 'var(--primary-dark)', fontSize: '20px', fontWeight: '750', marginBottom: '8px' }}>
+            ⚡ AI-driven PDF Question Parser
+          </h3>
+          <p style={{ fontSize: '13.5px', color: 'var(--text-muted)', marginBottom: '24px', lineHeight: '1.5' }}>
+            Upload any question paper PDF (containing MCQs). Our offline mobile parser extracts the questions, options, and dynamically flags correct answers to build an interactive quiz instantly.
+          </p>
+
+          <form onSubmit={handlePdfQuizSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+            <div style={{
+              border: '2px dashed var(--border-color)',
+              borderRadius: '16px',
+              padding: '40px 20px',
+              textAlign: 'center',
+              backgroundColor: '#fafafa',
+              cursor: 'pointer',
+              transition: 'all 0.2s ease'
+            }}
+            onClick={() => document.getElementById('pdfFileInput').click()}>
+              <input 
+                type="file" 
+                id="pdfFileInput" 
+                accept="application/pdf" 
+                style={{ display: 'none' }} 
+                onChange={e => setPdfFile(e.target.files[0])} 
+              />
+              <span style={{ fontSize: '36px' }}>📄</span>
+              <h4 style={{ fontSize: '15px', color: 'var(--primary-dark)', fontWeight: '700', marginTop: '12px' }}>
+                {pdfFile ? pdfFile.name : 'Select Question Paper PDF File'}
+              </h4>
+              <p style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '4px' }}>
+                {pdfFile ? `Size: ${(pdfFile.size / 1024 / 1024).toFixed(2)} MB` : 'Click to browse files or drag and drop here'}
+              </p>
+            </div>
+
+            {pdfNotice && (
+              <div style={{
+                padding: '14px 18px',
+                borderRadius: '10px',
+                fontSize: '13.5px',
+                fontWeight: '600',
+                backgroundColor: pdfNotice.startsWith('SUCCESS') ? 'var(--success-bg)' : 'var(--danger-bg)',
+                color: pdfNotice.startsWith('SUCCESS') ? 'var(--success)' : 'var(--danger)',
+                border: pdfNotice.startsWith('SUCCESS') ? '1px solid rgba(16,185,129,0.15)' : '1px solid rgba(239,68,68,0.15)'
+              }}>
+                {pdfNotice}
+              </div>
+            )}
+
+            <button 
+              type="submit" 
+              className="btn btn-secondary" 
+              disabled={pdfParsing || !pdfFile}
+              style={{
+                alignSelf: 'center',
+                padding: '12px 32px',
+                borderRadius: '12px',
+                fontSize: '14.5px',
+                fontWeight: '700',
+                opacity: (pdfParsing || !pdfFile) ? 0.6 : 1,
+                cursor: (pdfParsing || !pdfFile) ? 'not-allowed' : 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px'
+              }}
+            >
+              {pdfParsing ? (
+                <>
+                  <div className="loading-spinner" style={{ width: '16px', height: '16px', borderWidth: '2px' }}></div>
+                  <span>Parsing questions & options...</span>
+                </>
+              ) : (
+                <>
+                  <span>🚀 Ingest PDF & Generate Interactive Online Test</span>
+                </>
+              )}
+            </button>
+          </form>
+        </div>
+
+        {/* Existing Quizzes Table */}
+        <div className="glass" style={{ backgroundColor: '#ffffff', padding: '28px', borderRadius: '20px', border: '1px solid var(--border-color)', boxShadow: 'var(--shadow-sm)' }}>
+          <h4 style={{ fontFamily: 'var(--font-title)', color: 'var(--primary-dark)', fontSize: '17px', fontWeight: '750', marginBottom: '16px' }}>
+            Current Online Test Modules ({quizzesList.length})
+          </h4>
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+            {quizzesList.map(q => (
+              <div key={q.id} style={{ display: 'flex', justifySelf: 'stretch', justifyContent: 'space-between', alignItems: 'center', padding: '16px', border: '1px solid var(--border-color)', borderRadius: '12px', backgroundColor: '#fafafa' }}>
+                <div>
+                  <strong style={{ fontSize: '14.5px', color: 'var(--primary-dark)' }}>{q.title}</strong>
+                  <div style={{ display: 'flex', gap: '12px', marginTop: '6px', fontSize: '12px', color: 'var(--text-muted)' }}>
+                    <span>📝 {q.questions ? q.questions.length : 0} MCQs</span>
+                    {q.sourcePdf && (
+                      <span>
+                        📄 PDF Ref:{' '}
+                        <a href={q.sourcePdf} target="_blank" rel="noreferrer" style={{ color: 'var(--primary)', fontWeight: 'bold' }}>
+                          Download Ingested File
+                        </a>
+                      </span>
+                    )}
+                  </div>
+                </div>
+
+                <button 
+                  onClick={() => handleDeleteQuiz(q.id)} 
+                  className="btn" 
+                  style={{
+                    padding: '8px',
+                    borderRadius: '8px',
+                    border: '1px solid #fee2e2',
+                    backgroundColor: '#fef2f2',
+                    color: '#ef4444',
+                    display: 'flex',
+                    alignItems: 'center'
+                  }}
+                >
+                  <Trash2 size={14} />
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
+
+      </div>,
+      'pdf_quiz'
+    );
+  };
+
 
   /* ========================================================
      MASTER ROUTER / VIEW SWITCHER
@@ -2672,6 +3486,8 @@ export default function App() {
     if (currentPath === '#/admin/users') return renderAdminUsers();
     if (currentPath === '#/admin/payments') return renderAdminPayments();
     if (currentPath === '#/admin/sessions') return renderAdminSessions();
+    if (currentPath === '#/admin/promotions') return renderAdminPromotions();
+    if (currentPath === '#/admin/pdf-quiz') return renderAdminPdfQuiz();
 
     // Catch all fallback
     return renderHome();

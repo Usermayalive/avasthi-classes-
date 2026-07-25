@@ -1,0 +1,29 @@
+[
+  {
+    "id": "flyer-1",
+    "title": "RAS 2026 Foundation Super Batch",
+    "subtitle": "New Offline & Online Batch starting from 1st August. Admissions Open!",
+    "imageUrl": "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&q=80&w=1200",
+    "badge": "ADMISSIONS OPEN",
+    "targetExam": "RAS 2026",
+    "active": true
+  },
+  {
+    "id": "flyer-2",
+    "title": "REET Level 1 & 2 Pedagogy & GK Test Series",
+    "subtitle": "Top classroom faculty curated test series with video solutions.",
+    "imageUrl": "https://images.unsplash.com/photo-1434030216411-0b793f4b4173?auto=format&fit=crop&q=80&w=1200",
+    "badge": "50+ MOCK TESTS",
+    "targetExam": "REET 2026",
+    "active": true
+  },
+  {
+    "id": "flyer-3",
+    "title": "Rajasthan Police Constable Crash Course",
+    "subtitle": "Special daily doubt resolution & physical test guidance program.",
+    "imageUrl": "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&q=80&w=1200",
+    "badge": "SPECIAL BATCH",
+    "targetExam": "Police Constable",
+    "active": true
+  }
+]

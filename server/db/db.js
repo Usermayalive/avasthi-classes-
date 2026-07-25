@@ -329,7 +329,7 @@ function initializeDatabase() {
       name: "Avasthi Classes Admin",
       email: "admin@avasthiclasses.com",
       phone: "+919999988888",
-      passwordHash: "$2a$10$tZpt0v7wX6U7XfTf07Qy3uL1N1c5eM11p9n.dF6B5gW5G3Nq9/hUa", // "admin123"
+      passwordHash: "$2a$10$sjKfBl0A3VgROCMRnv3Q1ewzSHbI8FksdmVC7bXb7AWIUZRU9fBDe", // "admin123"
       role: "admin",
       createdAt: new Date().toISOString()
     },
@@ -338,7 +338,7 @@ function initializeDatabase() {
       name: "Rahul Sharma (Free Student)",
       email: "rahul@gmail.com",
       phone: "+919876543210",
-      passwordHash: "$2a$10$wO7oWkUlyqI/z3L47tEeeu59Tf8d16N6z5gW5G3Nq9/hUa", // "student123"
+      passwordHash: "$2a$10$CjmvJ0aAlf4Q8qadx0D9W.qe/i6YZWd9i6T2sYcO3ZC2/wdVTCAlO", // "123456"
       role: "subscriber",
       createdAt: new Date().toISOString()
     },
@@ -369,7 +369,102 @@ function initializeDatabase() {
       status: "captured",
       date: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString()
     }
-  ]);}
+  ]);
+
+  // Seed Promotional Data
+  const defaultFlyers = [
+    {
+      id: "flyer-1",
+      title: "RAS 2026 Foundation Super Batch",
+      subtitle: "New Offline & Online Batch starting from 1st August. Admissions Open!",
+      imageUrl: "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&q=80&w=1200",
+      badge: "ADMISSIONS OPEN",
+      targetExam: "RAS 2026",
+      active: true
+    },
+    {
+      id: "flyer-2",
+      title: "REET Level 1 & 2 Pedagogy & GK Test Series",
+      subtitle: "Top classroom faculty curated test series with video solutions.",
+      imageUrl: "https://images.unsplash.com/photo-1434030216411-0b793f4b4173?auto=format&fit=crop&q=80&w=1200",
+      badge: "50+ MOCK TESTS",
+      targetExam: "REET 2026",
+      active: true
+    },
+    {
+      id: "flyer-3",
+      title: "Rajasthan Police Constable Crash Course",
+      subtitle: "Special daily doubt resolution & physical test guidance program.",
+      imageUrl: "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&q=80&w=1200",
+      badge: "SPECIAL BATCH",
+      targetExam: "Police Constable",
+      active: true
+    }
+  ];
+  readJSON('flyers.json', defaultFlyers);
+
+  const defaultUpdates = [
+    {
+      id: "up-1",
+      title: "RAS Prelims 2026 Offline Test Series Schedule Released",
+      date: "25 Jul",
+      year: "2026",
+      category: "Schedule",
+      isNew: true,
+      description: "Detailed test timeline and syllabus breakdown for 35 offline tests is now available at the administrative block."
+    },
+    {
+      id: "up-2",
+      title: "Special Workshop on Rajasthan Economy & Budget Analysis",
+      date: "28 Jul",
+      year: "2026",
+      category: "Seminar",
+      isNew: true,
+      description: "Interactive session by Senior Faculty on Rajasthan State Budget highlights and economic review."
+    },
+    {
+      id: "up-3",
+      title: "REET 2026 Super-30 Merit Scholarship Test Announced",
+      date: "02 Aug",
+      year: "2026",
+      category: "Scholarship",
+      isNew: false,
+      description: "Top 30 rankers in the open diagnostic test will receive 100% tuition waiver for REET classroom coaching."
+    }
+  ];
+  readJSON('updates.json', defaultUpdates);
+
+  const defaultResults = [
+    {
+      id: "top-1",
+      name: "Pooja Choudhary",
+      exam: "RAS Exam 2023",
+      rank: "Rank 04",
+      year: "2023",
+      photoUrl: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&q=80&w=400",
+      testimonial: "Avasthi Classes guided me thoroughly for RAS Mains answer writing. The test series was instrumental in my top rank!"
+    },
+    {
+      id: "top-2",
+      name: "Vikram Singh Rathore",
+      exam: "REET Level-2",
+      rank: "Rank 01 (State Topper)",
+      year: "2024",
+      photoUrl: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=400",
+      testimonial: "The pedagogy guidance and daily offline quizzes gave me the confidence to secure State Rank 1."
+    },
+    {
+      id: "top-3",
+      name: "Rahul Sharma",
+      exam: "Rajasthan Police Sub-Inspector",
+      rank: "Rank 12",
+      year: "2024",
+      photoUrl: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=400",
+      testimonial: "Best coaching institute in Rajasthan for competitive exam preparation. Dedicated faculty and structured notes."
+    }
+  ];
+  readJSON('results.json', defaultResults);
+}
 
 // Initial Call
 initializeDatabase();
@@ -506,5 +601,27 @@ module.exports = {
     payments.push(payment);
     this.savePayments(payments);
     return payment;
+  },
+
+  // Promotional Data (Flyers, Updates/Bulletins, Topper Results)
+  getFlyers() {
+    return readJSON('flyers.json');
+  },
+  saveFlyers(flyers) {
+    return writeJSON('flyers.json', flyers);
+  },
+
+  getUpdates() {
+    return readJSON('updates.json');
+  },
+  saveUpdates(updates) {
+    return writeJSON('updates.json', updates);
+  },
+
+  getResults() {
+    return readJSON('results.json');
+  },
+  saveResults(results) {
+    return writeJSON('results.json', results);
   }
 };

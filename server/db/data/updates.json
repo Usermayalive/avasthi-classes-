@@ -1,0 +1,29 @@
+[
+  {
+    "id": "up-1",
+    "title": "RAS Prelims 2026 Offline Test Series Schedule Released",
+    "date": "25 Jul",
+    "year": "2026",
+    "category": "Schedule",
+    "isNew": true,
+    "description": "Detailed test timeline and syllabus breakdown for 35 offline tests is now available at the administrative block."
+  },
+  {
+    "id": "up-2",
+    "title": "Special Workshop on Rajasthan Economy & Budget Analysis",
+    "date": "28 Jul",
+    "year": "2026",
+    "category": "Seminar",
+    "isNew": true,
+    "description": "Interactive session by Senior Faculty on Rajasthan State Budget highlights and economic review."
+  },
+  {
+    "id": "up-3",
+    "title": "REET 2026 Super-30 Merit Scholarship Test Announced",
+    "date": "02 Aug",
+    "year": "2026",
+    "category": "Scholarship",
+    "isNew": false,
+    "description": "Top 30 rankers in the open diagnostic test will receive 100% tuition waiver for REET classroom coaching."
+  }
+]

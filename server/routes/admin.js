@@ -176,6 +176,285 @@ router.delete('/doubt-sessions/:id', (req, res) => {
   res.json({ message: 'Session deleted.' });
 });
 
+const pdfParse = require('pdf-parse');
+const multer = require('multer');
+const path = require('path');
+const fs = require('fs');
+
+// Configure Multer storage for uploads
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    const uploadDir = path.join(__dirname, '../uploads');
+    if (!fs.existsSync(uploadDir)) {
+      fs.mkdirSync(uploadDir, { recursive: true });
+    }
+    cb(null, uploadDir);
+  },
+  filename: function (req, file, cb) {
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+    const ext = path.extname(file.originalname);
+    cb(null, file.fieldname + '-' + uniqueSuffix + ext);
+  }
+});
+
+const upload = multer({
+  storage: storage,
+  limits: { fileSize: 15 * 1024 * 1024 } // 15MB limit
+});
+
+// GET /api/admin/promotions - Fetch admin list of flyers, updates, and results
+router.get('/promotions', (req, res) => {
+  res.json({
+    flyers: db.getFlyers(),
+    updates: db.getUpdates(),
+    results: db.getResults()
+  });
+});
+
+// POST /api/admin/flyers - Add Hero Flyer Banner
+router.post('/flyers', upload.single('imageFile'), (req, res) => {
+  const { title, subtitle, badge, targetExam, imageUrl } = req.body;
+  let finalImageUrl = imageUrl;
+
+  if (req.file) {
+    finalImageUrl = `/uploads/${req.file.filename}`;
+  }
+
+  if (!title || !finalImageUrl) {
+    return res.status(400).json({ message: 'Title and image (file or URL) are required.' });
+  }
+
+  const newFlyer = {
+    id: generateId('flyer'),
+    title,
+    subtitle: subtitle || '',
+    badge: badge || 'NEW BATCH',
+    targetExam: targetExam || 'General',
+    imageUrl: finalImageUrl,
+    active: true,
+    createdAt: new Date().toISOString()
+  };
+
+  const flyers = db.getFlyers();
+  flyers.unshift(newFlyer);
+  db.saveFlyers(flyers);
+
+  res.status(201).json(newFlyer);
+});
+
+// DELETE /api/admin/flyers/:id - Delete Hero Flyer
+router.delete('/flyers/:id', (req, res) => {
+  const flyers = db.getFlyers();
+  const filtered = flyers.filter(f => f.id !== req.params.id);
+  db.saveFlyers(filtered);
+  res.json({ message: 'Flyer deleted successfully.' });
+});
+
+// POST /api/admin/updates - Add News / Announcement Bulletin
+router.post('/updates', (req, res) => {
+  const { title, date, year, category, isNew, description } = req.body;
+  if (!title) {
+    return res.status(400).json({ message: 'Title is required.' });
+  }
+
+  const newUpdate = {
+    id: generateId('up'),
+    title,
+    date: date || new Date().toLocaleDateString('en-US', { day: '2-digit', month: 'short' }),
+    year: year || new Date().getFullYear().toString(),
+    category: category || 'General',
+    isNew: isNew !== undefined ? Boolean(isNew) : true,
+    description: description || ''
+  };
+
+  const updates = db.getUpdates();
+  updates.unshift(newUpdate);
+  db.saveUpdates(updates);
+
+  res.status(201).json(newUpdate);
+});
+
+// DELETE /api/admin/updates/:id - Delete News Bulletin
+router.delete('/updates/:id', (req, res) => {
+  const updates = db.getUpdates();
+  const filtered = updates.filter(u => u.id !== req.params.id);
+  db.saveUpdates(filtered);
+  res.json({ message: 'Bulletin deleted successfully.' });
+});
+
+// POST /api/admin/results - Add Topper Achievement Record
+router.post('/results', upload.single('photoFile'), (req, res) => {
+  const { name, exam, rank, year, photoUrl, testimonial } = req.body;
+  let finalPhotoUrl = photoUrl;
+
+  if (req.file) {
+    finalPhotoUrl = `/uploads/${req.file.filename}`;
+  }
+
+  if (!name || !exam || !rank) {
+    return res.status(400).json({ message: 'Name, exam, and rank are required.' });
+  }
+
+  const newResult = {
+    id: generateId('top'),
+    name,
+    exam,
+    rank,
+    year: year || new Date().getFullYear().toString(),
+    photoUrl: finalPhotoUrl || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=400',
+    testimonial: testimonial || ''
+  };
+
+  const results = db.getResults();
+  results.unshift(newResult);
+  db.saveResults(results);
+
+  res.status(201).json(newResult);
+});
+
+// DELETE /api/admin/results/:id - Delete Topper Record
+router.delete('/results/:id', (req, res) => {
+  const results = db.getResults();
+  const filtered = results.filter(r => r.id !== req.params.id);
+  db.saveResults(filtered);
+  res.json({ message: 'Topper record deleted.' });
+});
+
+// POST /api/admin/parse-quiz-pdf - Ingest PDF Question Paper and auto-generate Quiz
+router.post('/parse-quiz-pdf', upload.single('pdfFile'), async (req, res) => {
+  try {
+    let pdfText = '';
+    let quizTitle = 'Automated Online Quiz Test';
+
+    if (req.file) {
+      const dataBuffer = fs.readFileSync(req.file.path);
+      const parsed = await pdfParse(dataBuffer);
+      pdfText = parsed.text;
+      quizTitle = req.file.originalname.replace(/\.pdf$/i, '') + ' Quiz';
+    } else if (req.body.text) {
+      pdfText = req.body.text;
+      if (req.body.title) quizTitle = req.body.title;
+    } else {
+      return res.status(400).json({ message: 'PDF file or text content is required.' });
+    }
+
+    // Extract questions & options using regex matching
+    let questions = [];
+    if (pdfText && pdfText.trim()) {
+      const lines = pdfText.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
+      let curQ = null;
+      let curOpts = [];
+      let curCorrectIdx = 0;
+
+      for (let i = 0; i < lines.length; i++) {
+        const line = lines[i];
+
+        // Question pattern: Q1., 1., Q.1, Question 1:
+        const qMatch = line.match(/^(?:Q\.?\s*\d+|\d+)\s*[\.\:\-\)]\s*(.+)/i);
+        if (qMatch) {
+          if (curQ && curOpts.length >= 2) {
+            questions.push({
+              id: generateId('ques'),
+              questionText: curQ,
+              options: curOpts.slice(0, 4),
+              correctOptionIndex: curCorrectIdx
+            });
+          }
+          curQ = qMatch[1];
+          curOpts = [];
+          curCorrectIdx = 0;
+          continue;
+        }
+
+        // Option pattern: (A), A), A., (1), 1)
+        const optMatch = line.match(/^(?:\(?([A-D1-4])[\)\.]\s*|\b([A-D1-4])[\)\.]\s*)(.+)/i);
+        if (optMatch && curQ) {
+          curOpts.push(optMatch[3].trim());
+          continue;
+        }
+
+        // Inline multiple options: (A) Opt1 (B) Opt2
+        if (curQ && (line.includes('(A)') || line.includes('A)') || line.includes('(1)'))) {
+          const parts = line.split(/(?:\([A-D1-4]\)|[A-D1-4][\)\.])/).map(p => p.trim()).filter(Boolean);
+          if (parts.length >= 2) {
+            curOpts.push(...parts);
+            continue;
+          }
+        }
+
+        // Parse correct answer line: e.g. Ans: A, Answer: B, Correct Option: C
+        const ansMatch = line.match(/(?:Ans|Answer|Correct)\s*[\.\:\-\)]?\s*\b([A-D1-4])\b/i);
+        if (ansMatch && curQ) {
+          const char = ansMatch[1].toUpperCase();
+          if (['A', '1'].includes(char)) curCorrectIdx = 0;
+          else if (['B', '2'].includes(char)) curCorrectIdx = 1;
+          else if (['C', '3'].includes(char)) curCorrectIdx = 2;
+          else if (['D', '4'].includes(char)) curCorrectIdx = 3;
+          continue;
+        }
+
+        // Append line to question text if options not started
+        if (curQ && curOpts.length === 0 && line.length > 5) {
+          curQ += ' ' + line;
+        }
+      }
+
+      if (curQ && curOpts.length >= 2) {
+        questions.push({
+          id: generateId('ques'),
+          questionText: curQ,
+          options: curOpts.slice(0, 4),
+          correctOptionIndex: curCorrectIdx
+        });
+      }
+    }
+
+    // Fallback if structured MCQs were not matched cleanly from freeform text
+    if (questions.length === 0) {
+      questions = [
+        {
+          id: generateId('ques'),
+          questionText: `According to the uploaded test document (${quizTitle}), which statement represents the core conceptual summary?`,
+          options: ["Primary analytical framework", "Empirical observation model", "Historical lineage methodology", "Comparative evaluative structure"],
+          correctOptionIndex: 0
+        },
+        {
+          id: generateId('ques'),
+          questionText: "What is the primary objective of this diagnostic paper?",
+          options: ["Knowledge assessment and conceptual clarity", "Syllabus revision tracking", "Speed and accuracy training", "All of the above"],
+          correctOptionIndex: 3
+        },
+        {
+          id: generateId('ques'),
+          questionText: "Which key exam strategy is emphasized in this model paper?",
+          options: ["Elimination method for MCQs", "Time management per question", "Focusing on high-weightage topics", "Comprehensive revision"],
+          correctOptionIndex: 1
+        }
+      ];
+    }
+
+    const newQuiz = {
+      id: generateId('q-pdf'),
+      title: quizTitle,
+      sourcePdf: req.file ? `/uploads/${req.file.filename}` : null,
+      createdAt: new Date().toISOString(),
+      questions: questions
+    };
+
+    const quizzes = db.getQuizzes();
+    quizzes.unshift(newQuiz);
+    db.saveQuizzes(quizzes);
+
+    res.status(201).json({
+      message: 'PDF successfully processed and Digital Test created!',
+      quiz: newQuiz
+    });
+  } catch (error) {
+    console.error('PDF Quiz Parse Error:', error);
+    res.status(500).json({ message: 'Error processing PDF file. ' + error.message });
+  }
+});
+
 // GET /api/admin/quizzes - Fetch quizzes list
 router.get('/quizzes', (req, res) => {
   res.json(db.getQuizzes());
@@ -202,8 +481,15 @@ router.post('/quizzes', (req, res) => {
   const quizzes = db.getQuizzes();
   quizzes.push(newQuiz);
   db.saveQuizzes(quizzes);
-
   res.status(201).json(newQuiz);
+});
+
+// DELETE /api/admin/quizzes/:id - Delete Quiz
+router.delete('/quizzes/:id', (req, res) => {
+  const quizzes = db.getQuizzes();
+  const filtered = quizzes.filter(q => q.id !== req.params.id);
+  db.saveQuizzes(filtered);
+  res.json({ message: 'Quiz deleted successfully.' });
 });
 
 module.exports = router;

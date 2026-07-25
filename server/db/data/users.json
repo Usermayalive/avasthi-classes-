@@ -4,7 +4,7 @@
     "name": "Avasthi Classes Admin",
     "email": "admin@avasthiclasses.com",
     "phone": "+919999988888",
-    "passwordHash": "$2a$10$tZpt0v7wX6U7XfTf07Qy3uL1N1c5eM11p9n.dF6B5gW5G3Nq9/hUa",
+    "passwordHash": "$2a$10$sjKfBl0A3VgROCMRnv3Q1ewzSHbI8FksdmVC7bXb7AWIUZRU9fBDe",
     "role": "admin",
     "createdAt": "2026-06-30T18:37:00.412Z"
   },
@@ -13,7 +13,7 @@
     "name": "Rahul Sharma (Free Student)",
     "email": "rahul@gmail.com",
     "phone": "+919876543210",
-    "passwordHash": "$2a$10$wO7oWkUlyqI/z3L47tEeeu59Tf8d16N6z5gW5G3Nq9/hUa",
+    "passwordHash": "$2a$10$CjmvJ0aAlf4Q8qadx0D9W.qe/i6YZWd9i6T2sYcO3ZC2/wdVTCAlO",
     "role": "subscriber",
     "createdAt": "2026-06-30T18:37:00.412Z"
   },
@@ -22,7 +22,7 @@
     "name": "Ananya Sen (Premium Student)",
     "email": "ananya@gmail.com",
     "phone": "+918765432109",
-    "passwordHash": "$2a$10$wO7oWkUlyqI/z3L47tEeeu59Tf8d16N6z5gW5G3Nq9/hUa",
+    "passwordHash": "$2a$10$CjmvJ0aAlf4Q8qadx0D9W.qe/i6YZWd9i6T2sYcO3ZC2/wdVTCAlO",
     "role": "premium_student",
     "createdAt": "2026-06-30T18:37:00.412Z"
   }
