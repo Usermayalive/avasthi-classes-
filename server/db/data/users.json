@@ -1,0 +1,29 @@
+[
+  {
+    "id": "u-admin",
+    "name": "Avasthi Classes Admin",
+    "email": "admin@avasthiclasses.com",
+    "phone": "+919999988888",
+    "passwordHash": "$2a$10$tZpt0v7wX6U7XfTf07Qy3uL1N1c5eM11p9n.dF6B5gW5G3Nq9/hUa",
+    "role": "admin",
+    "createdAt": "2026-06-30T18:37:00.412Z"
+  },
+  {
+    "id": "u-demo",
+    "name": "Rahul Sharma (Free Student)",
+    "email": "rahul@gmail.com",
+    "phone": "+919876543210",
+    "passwordHash": "$2a$10$wO7oWkUlyqI/z3L47tEeeu59Tf8d16N6z5gW5G3Nq9/hUa",
+    "role": "subscriber",
+    "createdAt": "2026-06-30T18:37:00.412Z"
+  },
+  {
+    "id": "u-paid",
+    "name": "Ananya Sen (Premium Student)",
+    "email": "ananya@gmail.com",
+    "phone": "+918765432109",
+    "passwordHash": "$2a$10$wO7oWkUlyqI/z3L47tEeeu59Tf8d16N6z5gW5G3Nq9/hUa",
+    "role": "premium_student",
+    "createdAt": "2026-06-30T18:37:00.412Z"
+  }
+]

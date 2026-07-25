@@ -1,0 +1,13 @@
+[
+  {
+    "id": "p1",
+    "order_id": "order_mock_001",
+    "payment_id": "pay_mock_001",
+    "user_id": "u-paid",
+    "amount": 4999,
+    "course_id": "c-ras-pre-mains",
+    "course_title": "RAS (Rajasthan Administrative Services) Complete Course",
+    "status": "captured",
+    "date": "2026-06-29T18:37:00.413Z"
+  }
+]

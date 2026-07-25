@@ -1,0 +1,173 @@
+[
+  {
+    "id": "c-ras-pre-mains",
+    "title": "RAS (Rajasthan Administrative Services) Complete Course",
+    "description": "Comprehensive preparation course for RAS Prelims & Mains. Deep coverage of Rajasthan History, Polity, Geography, Economy, General Science, and Answer Writing practices.",
+    "thumbnail": "/images/ras_course.png",
+    "price": 4999,
+    "chapters": [
+      {
+        "id": "ch-ras-hist",
+        "title": "Chapter 1: History, Art & Culture of Rajasthan",
+        "description": "Major dynasties of Rajasthan, integration of Rajasthan, folk arts, paintings, fairs, and festivals.",
+        "isFreePreview": true,
+        "lessons": [
+          {
+            "id": "les-ras-hist-1",
+            "title": "1.1 Ancient Civilizations & Mewar Dynasty History",
+            "type": "video",
+            "duration": "45 min",
+            "videoUrl": "https://www.youtube.com/embed/dQw4w9WgXcQ"
+          },
+          {
+            "id": "les-ras-hist-2",
+            "title": "1.2 Study Notes on Major Forts & Temples of Rajasthan",
+            "type": "pdf",
+            "pdfUrl": "/notes/rajasthan_history_ch1.pdf"
+          },
+          {
+            "id": "les-ras-hist-3",
+            "title": "1.3 Rajasthan History & Dynasties Quiz",
+            "type": "quiz",
+            "quizId": "q-rajasthan-history"
+          }
+        ]
+      },
+      {
+        "id": "ch-ras-geo",
+        "title": "Chapter 2: Geography & Climate of Rajasthan",
+        "description": "Physical divisions, rivers, climate, soils, and forest resources of Rajasthan.",
+        "isFreePreview": false,
+        "lessons": [
+          {
+            "id": "les-ras-geo-1",
+            "title": "2.1 Physiography of Aravalli Range & Thar Desert",
+            "type": "video",
+            "duration": "40 min",
+            "videoUrl": "https://www.youtube.com/embed/dQw4w9WgXcQ"
+          },
+          {
+            "id": "les-ras-geo-2",
+            "title": "2.2 Mineral Wealth & Soil Distribution of Rajasthan PDF",
+            "type": "pdf",
+            "pdfUrl": "/notes/rajasthan_geography_ch2.pdf"
+          },
+          {
+            "id": "les-ras-geo-3",
+            "title": "2.3 Geography of Rajasthan MCQ",
+            "type": "quiz",
+            "quizId": "q-rajasthan-geography"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "c-reet-teacher",
+    "title": "REET (Rajasthan Eligibility Exam for Teachers) - Level 1 & 2",
+    "description": "Crack the REET exam with structured pedagogy lectures, language papers prep (Hindi/English), and Rajasthan General Knowledge aligned with the RBSE board curriculum.",
+    "thumbnail": "/images/reet_course.png",
+    "price": 1499,
+    "chapters": [
+      {
+        "id": "ch-reet-pedagogy",
+        "title": "Chapter 1: Child Development and Pedagogy",
+        "description": "Concept of growth and development, theories of intelligence, learning paradigms, and inclusive education.",
+        "isFreePreview": true,
+        "lessons": [
+          {
+            "id": "les-reet-ped-1",
+            "title": "1.1 Theories of Piaget, Vygotsky, and Kohlberg",
+            "type": "video",
+            "duration": "35 min",
+            "videoUrl": "https://www.youtube.com/embed/dQw4w9WgXcQ"
+          },
+          {
+            "id": "les-reet-ped-2",
+            "title": "1.2 Child Development Theories Study Notes PDF",
+            "type": "pdf",
+            "pdfUrl": "/notes/reet_pedagogy_ch1.pdf"
+          },
+          {
+            "id": "les-reet-ped-3",
+            "title": "1.3 Child Development and Pedagogy (REET) Quiz",
+            "type": "quiz",
+            "quizId": "q-reet-pedagogy"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "c-rajasthan-police",
+    "title": "Rajasthan Police SI & Constable Exam Course",
+    "description": "Prepare for the Sub Inspector and Constable exam. Complete guidelines for General Knowledge, General Science, Mental Ability, and Rajasthan GK.",
+    "thumbnail": "/images/police_course.png",
+    "price": 1999,
+    "chapters": [
+      {
+        "id": "ch-police-gk",
+        "title": "Chapter 1: General Knowledge & Science",
+        "description": "General Science principles, Indian History, Constitution, and Polity for Police competitive exams.",
+        "isFreePreview": true,
+        "lessons": [
+          {
+            "id": "les-police-gk-1",
+            "title": "1.1 Indian Constitution: Fundamental Rights & Duties",
+            "type": "video",
+            "duration": "50 min",
+            "videoUrl": "https://www.youtube.com/embed/dQw4w9WgXcQ"
+          },
+          {
+            "id": "les-police-gk-2",
+            "title": "1.2 General Science & Indian Polity Study Notes",
+            "type": "pdf",
+            "pdfUrl": "/notes/police_gk_ch1.pdf"
+          },
+          {
+            "id": "les-police-gk-3",
+            "title": "1.3 Rajasthan Police General GK Quiz",
+            "type": "quiz",
+            "quizId": "q-constable-gk"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "c-patwar-cet",
+    "title": "Rajasthan Patwar & CET (Common Eligibility Test)",
+    "description": "All-in-one preparation package for Rajasthan Patwar, VDO, and State Common Eligibility Test (CET) Graduation & 12th Level.",
+    "thumbnail": "/images/patwar_cet_course.png",
+    "price": 2499,
+    "chapters": [
+      {
+        "id": "ch-patwar-polity",
+        "title": "Chapter 1: Rajasthan Administrative & Polity Setup",
+        "description": "Governor, Chief Minister, State Legislative Assembly, High Court, and Local Self-Government (Panchayati Raj).",
+        "isFreePreview": true,
+        "lessons": [
+          {
+            "id": "les-patwar-polity-1",
+            "title": "1.1 Governor & State Assembly Powers & Roles",
+            "type": "video",
+            "duration": "30 min",
+            "videoUrl": "https://www.youtube.com/embed/dQw4w9WgXcQ"
+          },
+          {
+            "id": "les-patwar-polity-2",
+            "title": "1.2 Panchayati Raj & Local Government Notes",
+            "type": "pdf",
+            "pdfUrl": "/notes/patwar_polity_ch1.pdf"
+          },
+          {
+            "id": "les-patwar-polity-3",
+            "title": "1.3 Rajasthan Polity & Administration MCQ",
+            "type": "quiz",
+            "quizId": "q-polity-basics"
+          }
+        ]
+      }
+    ]
+  }
+]

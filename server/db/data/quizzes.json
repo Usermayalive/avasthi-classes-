@@ -1,0 +1,153 @@
+[
+  {
+    "id": "q-rajasthan-history",
+    "title": "Rajasthan History & Dynasties Quiz",
+    "questions": [
+      {
+        "id": "q1",
+        "questionText": "Which famous Battle of Haldighati was fought in 1576 AD?",
+        "options": [
+          "Maharana Pratap and Akbar's army",
+          "Prithviraj Chauhan and Muhammad Ghori",
+          "Rana Sanga and Babur",
+          "Maldeo Rathore and Sher Shah Suri"
+        ],
+        "correctOptionIndex": 0
+      },
+      {
+        "id": "q2",
+        "questionText": "Who was the founder of the Mewar Dynasty?",
+        "options": [
+          "Bappa Rawal",
+          "Rana Hamir",
+          "Rana Kumbha",
+          "Rana Sanga"
+        ],
+        "correctOptionIndex": 0
+      },
+      {
+        "id": "q3",
+        "questionText": "The famous Kirti Stambha (Tower of Fame) at Chittorgarh was built by:",
+        "options": [
+          "Rana Kumbha",
+          "Rana Sanga",
+          "Rana Pratap",
+          "Rana Udai Singh"
+        ],
+        "correctOptionIndex": 0
+      }
+    ]
+  },
+  {
+    "id": "q-rajasthan-geography",
+    "title": "Geography of Rajasthan MCQ",
+    "questions": [
+      {
+        "id": "qp1",
+        "questionText": "Which is the highest peak in Rajasthan?",
+        "options": [
+          "Guru Shikhar",
+          "Ser",
+          "Achalgarh",
+          "Dilwara"
+        ],
+        "correctOptionIndex": 0
+      },
+      {
+        "id": "qp2",
+        "questionText": "Which river is known as the 'Ganga of Mewar' or 'Vashisthi'?",
+        "options": [
+          "Banas",
+          "Chambal",
+          "Luni",
+          "Mahi"
+        ],
+        "correctOptionIndex": 0
+      }
+    ]
+  },
+  {
+    "id": "q-reet-pedagogy",
+    "title": "Child Development and Pedagogy (REET)",
+    "questions": [
+      {
+        "id": "rp1",
+        "questionText": "According to Piaget, in which stage does a child develop object permanence?",
+        "options": [
+          "Sensory-motor stage",
+          "Pre-operational stage",
+          "Concrete operational stage",
+          "Formal operational stage"
+        ],
+        "correctOptionIndex": 0
+      },
+      {
+        "id": "rp2",
+        "questionText": "The 'Trial and Error' theory of learning was proposed by:",
+        "options": [
+          "Thorndike",
+          "Pavlov",
+          "Skinner",
+          "Kohler"
+        ],
+        "correctOptionIndex": 0
+      }
+    ]
+  },
+  {
+    "id": "q-constable-gk",
+    "title": "Rajasthan Police General GK Quiz",
+    "questions": [
+      {
+        "id": "pg1",
+        "questionText": "In which year was the Rajasthan Police force established?",
+        "options": [
+          "1949",
+          "1950",
+          "1951",
+          "1956"
+        ],
+        "correctOptionIndex": 2
+      },
+      {
+        "id": "pg2",
+        "questionText": "Where is the Rajasthan Police Academy located?",
+        "options": [
+          "Jaipur",
+          "Jodhpur",
+          "Ajmer",
+          "Bikaner"
+        ],
+        "correctOptionIndex": 0
+      }
+    ]
+  },
+  {
+    "id": "q-polity-basics",
+    "title": "Rajasthan Polity & Administration MCQ",
+    "questions": [
+      {
+        "id": "pb1",
+        "questionText": "Who was the first Governor of Rajasthan?",
+        "options": [
+          "Gurumukh Nihal Singh",
+          "Sawai Man Singh",
+          "Sampurnanand",
+          "Madan Lal Khurana"
+        ],
+        "correctOptionIndex": 0
+      },
+      {
+        "id": "pb2",
+        "questionText": "How many members are there in the Rajasthan Legislative Assembly (Vidhan Sabha)?",
+        "options": [
+          "150",
+          "200",
+          "250",
+          "180"
+        ],
+        "correctOptionIndex": 1
+      }
+    ]
+  }
+]
