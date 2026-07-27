@@ -73,10 +73,15 @@ if (fs.existsSync(CLIENT_DIST)) {
   });
 }
 
-// Start Server
-app.listen(PORT, () => {
-  console.log(`=========================================`);
-  console.log(`   AVASTHI CLASSES LMS BACKEND RUNNING   `);
-  console.log(`   URL: http://localhost:${PORT}        `);
-  console.log(`=========================================`);
-});
+// Start Server only if not running in Vercel
+if (process.env.NODE_ENV !== 'production' || !process.env.VERCEL) {
+  app.listen(PORT, () => {
+    console.log(`=========================================`);
+    console.log(`   AVASTHI CLASSES LMS BACKEND RUNNING   `);
+    console.log(`   URL: http://localhost:${PORT}        `);
+    console.log(`=========================================`);
+  });
+}
+
+// Export for Vercel serverless
+module.exports = app;

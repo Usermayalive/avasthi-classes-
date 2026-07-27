@@ -338,99 +338,83 @@ router.post('/parse-quiz-pdf', upload.single('pdfFile'), async (req, res) => {
       return res.status(400).json({ message: 'PDF file or text content is required.' });
     }
 
+    // Check if we found any text
+    if (!pdfText || !pdfText.trim()) {
+      return res.status(400).json({ message: 'No readable text found in the PDF. Please ensure you upload a text-based PDF (like a Word document saved as PDF), and NOT a scanned image.' });
+    }
+
     // Extract questions & options using regex matching
     let questions = [];
-    if (pdfText && pdfText.trim()) {
-      const lines = pdfText.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
-      let curQ = null;
-      let curOpts = [];
-      let curCorrectIdx = 0;
+    const lines = pdfText.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
+    let curQ = null;
+    let curOpts = [];
+    let curCorrectIdx = 0;
 
-      for (let i = 0; i < lines.length; i++) {
-        const line = lines[i];
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i];
 
-        // Question pattern: Q1., 1., Q.1, Question 1:
-        const qMatch = line.match(/^(?:Q\.?\s*\d+|\d+)\s*[\.\:\-\)]\s*(.+)/i);
-        if (qMatch) {
-          if (curQ && curOpts.length >= 2) {
-            questions.push({
-              id: generateId('ques'),
-              questionText: curQ,
-              options: curOpts.slice(0, 4),
-              correctOptionIndex: curCorrectIdx
-            });
-          }
-          curQ = qMatch[1];
-          curOpts = [];
-          curCorrectIdx = 0;
+      // Question pattern: Q1., 1., Q.1, Question 1:
+      const qMatch = line.match(/^(?:Q|Question|Ques)?\.?\s*\d+\s*[\.\:\-\)]\s*(.+)/i) || line.match(/^\d+\s*[\.\:\-\)]\s*(.+)/i);
+      if (qMatch) {
+        if (curQ && curOpts.length >= 2) {
+          questions.push({
+            id: generateId('ques'),
+            questionText: curQ,
+            options: curOpts.slice(0, 4),
+            correctOptionIndex: curCorrectIdx
+          });
+        }
+        curQ = qMatch[1];
+        curOpts = [];
+        curCorrectIdx = 0;
+        continue;
+      }
+
+      // Option pattern: (A), A), A., (1), 1)
+      const optMatch = line.match(/^(?:\(?([A-D1-4])[\)\.]\s*|\b([A-D1-4])[\)\.]\s*)(.+)/i);
+      if (optMatch && curQ) {
+        curOpts.push(optMatch[3].trim());
+        continue;
+      }
+
+      // Inline multiple options: (A) Opt1 (B) Opt2
+      if (curQ && (line.includes('(A)') || line.includes('A)') || line.includes('(1)'))) {
+        const parts = line.split(/(?:\([A-D1-4]\)|[A-D1-4][\)\.])/).map(p => p.trim()).filter(Boolean);
+        if (parts.length >= 2) {
+          curOpts.push(...parts);
           continue;
-        }
-
-        // Option pattern: (A), A), A., (1), 1)
-        const optMatch = line.match(/^(?:\(?([A-D1-4])[\)\.]\s*|\b([A-D1-4])[\)\.]\s*)(.+)/i);
-        if (optMatch && curQ) {
-          curOpts.push(optMatch[3].trim());
-          continue;
-        }
-
-        // Inline multiple options: (A) Opt1 (B) Opt2
-        if (curQ && (line.includes('(A)') || line.includes('A)') || line.includes('(1)'))) {
-          const parts = line.split(/(?:\([A-D1-4]\)|[A-D1-4][\)\.])/).map(p => p.trim()).filter(Boolean);
-          if (parts.length >= 2) {
-            curOpts.push(...parts);
-            continue;
-          }
-        }
-
-        // Parse correct answer line: e.g. Ans: A, Answer: B, Correct Option: C
-        const ansMatch = line.match(/(?:Ans|Answer|Correct)\s*[\.\:\-\)]?\s*\b([A-D1-4])\b/i);
-        if (ansMatch && curQ) {
-          const char = ansMatch[1].toUpperCase();
-          if (['A', '1'].includes(char)) curCorrectIdx = 0;
-          else if (['B', '2'].includes(char)) curCorrectIdx = 1;
-          else if (['C', '3'].includes(char)) curCorrectIdx = 2;
-          else if (['D', '4'].includes(char)) curCorrectIdx = 3;
-          continue;
-        }
-
-        // Append line to question text if options not started
-        if (curQ && curOpts.length === 0 && line.length > 5) {
-          curQ += ' ' + line;
         }
       }
 
-      if (curQ && curOpts.length >= 2) {
-        questions.push({
-          id: generateId('ques'),
-          questionText: curQ,
-          options: curOpts.slice(0, 4),
-          correctOptionIndex: curCorrectIdx
-        });
+      // Parse correct answer line: e.g. Ans: A, Answer: B, Correct Option: C
+      const ansMatch = line.match(/(?:Ans|Answer|Correct)[^A-Za-z0-9]*\b([A-D1-4])\b/i);
+      if (ansMatch && curQ) {
+        const char = ansMatch[1].toUpperCase();
+        if (['A', '1'].includes(char)) curCorrectIdx = 0;
+        else if (['B', '2'].includes(char)) curCorrectIdx = 1;
+        else if (['C', '3'].includes(char)) curCorrectIdx = 2;
+        else if (['D', '4'].includes(char)) curCorrectIdx = 3;
+        continue;
+      }
+
+      // Append line to question text if options not started
+      if (curQ && curOpts.length === 0 && line.length > 3) {
+        curQ += ' ' + line;
       }
     }
 
-    // Fallback if structured MCQs were not matched cleanly from freeform text
+    if (curQ && curOpts.length >= 2) {
+      questions.push({
+        id: generateId('ques'),
+        questionText: curQ,
+        options: curOpts.slice(0, 4),
+        correctOptionIndex: curCorrectIdx
+      });
+    }
+
+    // If no questions could be parsed from the text
     if (questions.length === 0) {
-      questions = [
-        {
-          id: generateId('ques'),
-          questionText: `According to the uploaded test document (${quizTitle}), which statement represents the core conceptual summary?`,
-          options: ["Primary analytical framework", "Empirical observation model", "Historical lineage methodology", "Comparative evaluative structure"],
-          correctOptionIndex: 0
-        },
-        {
-          id: generateId('ques'),
-          questionText: "What is the primary objective of this diagnostic paper?",
-          options: ["Knowledge assessment and conceptual clarity", "Syllabus revision tracking", "Speed and accuracy training", "All of the above"],
-          correctOptionIndex: 3
-        },
-        {
-          id: generateId('ques'),
-          questionText: "Which key exam strategy is emphasized in this model paper?",
-          options: ["Elimination method for MCQs", "Time management per question", "Focusing on high-weightage topics", "Comprehensive revision"],
-          correctOptionIndex: 1
-        }
-      ];
+      return res.status(400).json({ message: 'Could not automatically extract questions from this PDF. Please ensure the formatting matches standard multiple-choice conventions (e.g. "Q1. ...", "(A) ...").' });
     }
 
     const newQuiz = {
@@ -438,6 +422,7 @@ router.post('/parse-quiz-pdf', upload.single('pdfFile'), async (req, res) => {
       title: quizTitle,
       sourcePdf: req.file ? `/uploads/${req.file.filename}` : null,
       createdAt: new Date().toISOString(),
+      durationMinutes: req.body.duration ? parseInt(req.body.duration) : null,
       questions: questions
     };
 

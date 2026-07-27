@@ -1,170 +1,275 @@
 [
   {
-    "id": "c-ras-pre-mains",
-    "title": "RAS (Rajasthan Administrative Services) Complete Course",
-    "description": "Comprehensive preparation course for RAS Prelims & Mains. Deep coverage of Rajasthan History, Polity, Geography, Economy, General Science, and Answer Writing practices.",
+    "id": "c-2nd-grade",
+    "title": "2nd Grade",
+    "description": "Complete preparation course for the 2nd Grade Teacher examination.",
     "thumbnail": "/images/ras_course.png",
-    "price": 4999,
+    "price": 18000,
     "chapters": [
       {
-        "id": "ch-ras-hist",
-        "title": "Chapter 1: History, Art & Culture of Rajasthan",
-        "description": "Major dynasties of Rajasthan, integration of Rajasthan, folk arts, paintings, fairs, and festivals.",
+        "id": "ch-2nd-grade-syl",
+        "title": "Syllabus & Introduction",
+        "description": "Detailed syllabus for the 2nd Grade examination.",
         "isFreePreview": true,
         "lessons": [
           {
-            "id": "les-ras-hist-1",
-            "title": "1.1 Ancient Civilizations & Mewar Dynasty History",
-            "type": "video",
-            "duration": "45 min",
-            "videoUrl": "https://www.youtube.com/embed/dQw4w9WgXcQ"
-          },
-          {
-            "id": "les-ras-hist-2",
-            "title": "1.2 Study Notes on Major Forts & Temples of Rajasthan",
+            "id": "les-2nd-grade-pdf",
+            "title": "Course Syllabus PDF",
             "type": "pdf",
-            "pdfUrl": "/notes/rajasthan_history_ch1.pdf"
-          },
-          {
-            "id": "les-ras-hist-3",
-            "title": "1.3 Rajasthan History & Dynasties Quiz",
-            "type": "quiz",
-            "quizId": "q-rajasthan-history"
-          }
-        ]
-      },
-      {
-        "id": "ch-ras-geo",
-        "title": "Chapter 2: Geography & Climate of Rajasthan",
-        "description": "Physical divisions, rivers, climate, soils, and forest resources of Rajasthan.",
-        "isFreePreview": false,
-        "lessons": [
-          {
-            "id": "les-ras-geo-1",
-            "title": "2.1 Physiography of Aravalli Range & Thar Desert",
-            "type": "video",
-            "duration": "40 min",
-            "videoUrl": "https://www.youtube.com/embed/dQw4w9WgXcQ"
-          },
-          {
-            "id": "les-ras-geo-2",
-            "title": "2.2 Mineral Wealth & Soil Distribution of Rajasthan PDF",
-            "type": "pdf",
-            "pdfUrl": "/notes/rajasthan_geography_ch2.pdf"
-          },
-          {
-            "id": "les-ras-geo-3",
-            "title": "2.3 Geography of Rajasthan MCQ",
-            "type": "quiz",
-            "quizId": "q-rajasthan-geography"
+            "pdfUrl": "https://drive.google.com/drive/folders/1zCoXrEReGEaQ6ExUlUl8ziD0vdA1Hv12?usp=sharing"
           }
         ]
       }
     ]
   },
   {
-    "id": "c-reet-teacher",
-    "title": "REET (Rajasthan Eligibility Exam for Teachers) - Level 1 & 2",
-    "description": "Crack the REET exam with structured pedagogy lectures, language papers prep (Hindi/English), and Rajasthan General Knowledge aligned with the RBSE board curriculum.",
+    "id": "c-reet-mains",
+    "title": "Reet Mains L1, L2",
+    "description": "Comprehensive preparation for REET Mains examinations (Level 1 & Level 2).",
     "thumbnail": "/images/reet_course.png",
-    "price": 1499,
+    "price": 15000,
     "chapters": [
       {
-        "id": "ch-reet-pedagogy",
-        "title": "Chapter 1: Child Development and Pedagogy",
-        "description": "Concept of growth and development, theories of intelligence, learning paradigms, and inclusive education.",
+        "id": "ch-reetmains-syl",
+        "title": "Syllabus & Introduction",
+        "description": "Detailed syllabus for REET Mains.",
         "isFreePreview": true,
         "lessons": [
           {
-            "id": "les-reet-ped-1",
-            "title": "1.1 Theories of Piaget, Vygotsky, and Kohlberg",
-            "type": "video",
-            "duration": "35 min",
-            "videoUrl": "https://www.youtube.com/embed/dQw4w9WgXcQ"
-          },
-          {
-            "id": "les-reet-ped-2",
-            "title": "1.2 Child Development Theories Study Notes PDF",
+            "id": "les-reetmains-pdf",
+            "title": "Course Syllabus PDF",
             "type": "pdf",
-            "pdfUrl": "/notes/reet_pedagogy_ch1.pdf"
-          },
-          {
-            "id": "les-reet-ped-3",
-            "title": "1.3 Child Development and Pedagogy (REET) Quiz",
-            "type": "quiz",
-            "quizId": "q-reet-pedagogy"
+            "pdfUrl": "https://drive.google.com/drive/folders/1zCoXrEReGEaQ6ExUlUl8ziD0vdA1Hv12?usp=sharing"
           }
         ]
       }
     ]
   },
   {
-    "id": "c-rajasthan-police",
-    "title": "Rajasthan Police SI & Constable Exam Course",
-    "description": "Prepare for the Sub Inspector and Constable exam. Complete guidelines for General Knowledge, General Science, Mental Ability, and Rajasthan GK.",
-    "thumbnail": "/images/police_course.png",
-    "price": 1999,
+    "id": "c-reet-pre",
+    "title": "Reet Pre L1, L2",
+    "description": "Comprehensive preparation for REET Prelims examinations (Level 1 & Level 2).",
+    "thumbnail": "/images/reet_course.png",
+    "price": 12000,
     "chapters": [
       {
-        "id": "ch-police-gk",
-        "title": "Chapter 1: General Knowledge & Science",
-        "description": "General Science principles, Indian History, Constitution, and Polity for Police competitive exams.",
+        "id": "ch-reetpre-syl",
+        "title": "Syllabus & Introduction",
+        "description": "Detailed syllabus for REET Prelims.",
         "isFreePreview": true,
         "lessons": [
           {
-            "id": "les-police-gk-1",
-            "title": "1.1 Indian Constitution: Fundamental Rights & Duties",
-            "type": "video",
-            "duration": "50 min",
-            "videoUrl": "https://www.youtube.com/embed/dQw4w9WgXcQ"
-          },
-          {
-            "id": "les-police-gk-2",
-            "title": "1.2 General Science & Indian Polity Study Notes",
+            "id": "les-reetpre-pdf",
+            "title": "Course Syllabus PDF",
             "type": "pdf",
-            "pdfUrl": "/notes/police_gk_ch1.pdf"
-          },
-          {
-            "id": "les-police-gk-3",
-            "title": "1.3 Rajasthan Police General GK Quiz",
-            "type": "quiz",
-            "quizId": "q-constable-gk"
+            "pdfUrl": "https://drive.google.com/drive/folders/1zCoXrEReGEaQ6ExUlUl8ziD0vdA1Hv12?usp=sharing"
           }
         ]
       }
     ]
   },
   {
-    "id": "c-patwar-cet",
-    "title": "Rajasthan Patwar & CET (Common Eligibility Test)",
-    "description": "All-in-one preparation package for Rajasthan Patwar, VDO, and State Common Eligibility Test (CET) Graduation & 12th Level.",
+    "id": "c-foundation-1yr",
+    "title": "Foundation (1 Year)",
+    "description": "1-Year strong foundation course covering basics for competitive exams.",
+    "thumbnail": "/images/ras_course.png",
+    "price": 15000,
+    "chapters": [
+      {
+        "id": "ch-found1-syl",
+        "title": "Syllabus & Introduction",
+        "description": "Detailed syllabus.",
+        "isFreePreview": true,
+        "lessons": [
+          {
+            "id": "les-found1-pdf",
+            "title": "Course Syllabus PDF",
+            "type": "pdf",
+            "pdfUrl": "https://drive.google.com/drive/folders/1zCoXrEReGEaQ6ExUlUl8ziD0vdA1Hv12?usp=sharing"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "c-foundation-6mo",
+    "title": "Foundation (6 Months)",
+    "description": "6-Month fast-track foundation course for competitive exams.",
+    "thumbnail": "/images/ras_course.png",
+    "price": 8000,
+    "chapters": [
+      {
+        "id": "ch-found6-syl",
+        "title": "Syllabus & Introduction",
+        "description": "Detailed syllabus.",
+        "isFreePreview": true,
+        "lessons": [
+          {
+            "id": "les-found6-pdf",
+            "title": "Course Syllabus PDF",
+            "type": "pdf",
+            "pdfUrl": "https://drive.google.com/drive/folders/1zCoXrEReGEaQ6ExUlUl8ziD0vdA1Hv12?usp=sharing"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "c-cet",
+    "title": "CET 10+2 / Graduation",
+    "description": "Comprehensive preparation for Common Eligibility Test (CET) both 10+2 and Graduation levels.",
     "thumbnail": "/images/patwar_cet_course.png",
-    "price": 2499,
+    "price": 6000,
     "chapters": [
       {
-        "id": "ch-patwar-polity",
-        "title": "Chapter 1: Rajasthan Administrative & Polity Setup",
-        "description": "Governor, Chief Minister, State Legislative Assembly, High Court, and Local Self-Government (Panchayati Raj).",
+        "id": "ch-cet-syl",
+        "title": "Syllabus & Introduction",
+        "description": "Detailed syllabus for CET.",
         "isFreePreview": true,
         "lessons": [
           {
-            "id": "les-patwar-polity-1",
-            "title": "1.1 Governor & State Assembly Powers & Roles",
-            "type": "video",
-            "duration": "30 min",
-            "videoUrl": "https://www.youtube.com/embed/dQw4w9WgXcQ"
-          },
-          {
-            "id": "les-patwar-polity-2",
-            "title": "1.2 Panchayati Raj & Local Government Notes",
+            "id": "les-cet-pdf",
+            "title": "Course Syllabus PDF",
             "type": "pdf",
-            "pdfUrl": "/notes/patwar_polity_ch1.pdf"
-          },
+            "pdfUrl": "https://drive.google.com/drive/folders/1zCoXrEReGEaQ6ExUlUl8ziD0vdA1Hv12?usp=sharing"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "c-ssc",
+    "title": "SSC",
+    "description": "Complete package for Staff Selection Commission (SSC) exams.",
+    "thumbnail": "/images/ras_course.png",
+    "price": 6000,
+    "chapters": [
+      {
+        "id": "ch-ssc-syl",
+        "title": "Syllabus & Introduction",
+        "description": "Detailed syllabus for SSC.",
+        "isFreePreview": true,
+        "lessons": [
           {
-            "id": "les-patwar-polity-3",
-            "title": "1.3 Rajasthan Polity & Administration MCQ",
-            "type": "quiz",
-            "quizId": "q-polity-basics"
+            "id": "les-ssc-pdf",
+            "title": "Course Syllabus PDF",
+            "type": "pdf",
+            "pdfUrl": "https://drive.google.com/drive/folders/1zCoXrEReGEaQ6ExUlUl8ziD0vdA1Hv12?usp=sharing"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "c-rrb",
+    "title": "RRB",
+    "description": "Prepare effectively for Railway Recruitment Board (RRB) examinations.",
+    "thumbnail": "/images/ras_course.png",
+    "price": 6000,
+    "chapters": [
+      {
+        "id": "ch-rrb-syl",
+        "title": "Syllabus & Introduction",
+        "description": "Detailed syllabus for RRB.",
+        "isFreePreview": true,
+        "lessons": [
+          {
+            "id": "les-rrb-pdf",
+            "title": "Course Syllabus PDF",
+            "type": "pdf",
+            "pdfUrl": "https://drive.google.com/drive/folders/1zCoXrEReGEaQ6ExUlUl8ziD0vdA1Hv12?usp=sharing"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "c-raj-police",
+    "title": "Raj Police",
+    "description": "Targeted course for Rajasthan Police recruitment exams.",
+    "thumbnail": "/images/police_course.png",
+    "price": 6000,
+    "chapters": [
+      {
+        "id": "ch-rajpol-syl",
+        "title": "Syllabus & Introduction",
+        "description": "Detailed syllabus for Raj Police.",
+        "isFreePreview": true,
+        "lessons": [
+          {
+            "id": "les-rajpol-pdf",
+            "title": "Course Syllabus PDF",
+            "type": "pdf",
+            "pdfUrl": "https://drive.google.com/drive/folders/1zCoXrEReGEaQ6ExUlUl8ziD0vdA1Hv12?usp=sharing"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "c-delhi-police",
+    "title": "Delhi Police",
+    "description": "Dedicated preparation course for Delhi Police examinations.",
+    "thumbnail": "/images/police_course.png",
+    "price": 6000,
+    "chapters": [
+      {
+        "id": "ch-delpol-syl",
+        "title": "Syllabus & Introduction",
+        "description": "Detailed syllabus for Delhi Police.",
+        "isFreePreview": true,
+        "lessons": [
+          {
+            "id": "les-delpol-pdf",
+            "title": "Course Syllabus PDF",
+            "type": "pdf",
+            "pdfUrl": "https://drive.google.com/drive/folders/1zCoXrEReGEaQ6ExUlUl8ziD0vdA1Hv12?usp=sharing"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "c-army",
+    "title": "Army",
+    "description": "Prepare for Indian Army recruitment examinations with our expert guidance.",
+    "thumbnail": "/images/ras_course.png",
+    "price": 6000,
+    "chapters": [
+      {
+        "id": "ch-army-syl",
+        "title": "Syllabus & Introduction",
+        "description": "Detailed syllabus for Army.",
+        "isFreePreview": true,
+        "lessons": [
+          {
+            "id": "les-army-pdf",
+            "title": "Course Syllabus PDF",
+            "type": "pdf",
+            "pdfUrl": "https://drive.google.com/drive/folders/1zCoXrEReGEaQ6ExUlUl8ziD0vdA1Hv12?usp=sharing"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "c-pre-bstc",
+    "title": "Pre BSTC",
+    "description": "Pre BSTC examination preparation with complete syllabus coverage.",
+    "thumbnail": "/images/reet_course.png",
+    "price": 4500,
+    "chapters": [
+      {
+        "id": "ch-bstc-syl",
+        "title": "Syllabus & Introduction",
+        "description": "Detailed syllabus for Pre BSTC.",
+        "isFreePreview": true,
+        "lessons": [
+          {
+            "id": "les-bstc-pdf",
+            "title": "Course Syllabus PDF",
+            "type": "pdf",
+            "pdfUrl": "https://drive.google.com/drive/folders/1zCoXrEReGEaQ6ExUlUl8ziD0vdA1Hv12?usp=sharing"
           }
         ]
       }

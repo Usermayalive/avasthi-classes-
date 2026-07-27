@@ -10,6 +10,45 @@ import {
   ArrowRight, Shield, Award, Users, FileCheck, Layers, LogOut
 } from 'lucide-react';
 
+const QuizTimer = ({ durationMinutes, onExpire, isSubmitted }) => {
+  const [timeLeft, setTimeLeft] = useState(durationMinutes * 60);
+
+  useEffect(() => {
+    if (isSubmitted || timeLeft <= 0) return;
+    const timer = setInterval(() => {
+      setTimeLeft(prev => {
+        if (prev <= 1) {
+          clearInterval(timer);
+          onExpire();
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+    return () => clearInterval(timer);
+  }, [isSubmitted, timeLeft, onExpire]);
+
+  const mins = Math.floor(timeLeft / 60);
+  const secs = timeLeft % 60;
+  
+  return (
+    <div style={{
+      padding: '12px 20px',
+      borderRadius: '8px',
+      backgroundColor: timeLeft < 60 ? '#fee2e2' : '#e0f2fe',
+      color: timeLeft < 60 ? '#ef4444' : 'var(--primary-dark)',
+      fontWeight: 'bold',
+      fontSize: '18px',
+      border: `2px solid ${timeLeft < 60 ? '#fca5a5' : '#7dd3fc'}`,
+      display: 'inline-flex',
+      alignItems: 'center',
+      gap: '8px'
+    }}>
+      ⏱️ {mins.toString().padStart(2, '0')}:{secs.toString().padStart(2, '0')}
+    </div>
+  );
+};
+
 export default function App() {
   // Session State
   const [user, setUser] = useState(null);
@@ -33,6 +72,8 @@ export default function App() {
   // Student Test Portal & Quizzes State
   const [quizzesList, setQuizzesList] = useState([]);
   const [activePracticeQuiz, setActivePracticeQuiz] = useState(null);
+  const [testSelectedAnswers, setTestSelectedAnswers] = useState({});
+  const [testSubmitted, setTestSubmitted] = useState(false);
 
   // Lead Capture Modal State
   const [inquireModalCourse, setInquireModalCourse] = useState(null);
@@ -48,6 +89,7 @@ export default function App() {
   const [pdfFile, setPdfFile] = useState(null);
   const [pdfParsing, setPdfParsing] = useState(false);
   const [pdfNotice, setPdfNotice] = useState('');
+  const [pdfQuizDuration, setPdfQuizDuration] = useState('');
 
   // Overlay / Pop-up State
   const [paymentCourse, setPaymentCourse] = useState(null);
@@ -653,7 +695,7 @@ export default function App() {
                     <h3 className="course-title" style={{ fontSize: '18px', fontWeight: '750' }}>{course.title}</h3>
                     <p className="course-desc">{course.description}</p>
                     <div className="course-footer">
-                      <span className="course-price">₹{course.price}</span>
+                      {course.price !== undefined && <span className="course-price">₹{course.price}</span>}
                       <button onClick={() => navigateTo(`#/course/${course.id}`)} className="btn btn-primary" style={{ padding: '10px 20px', fontSize: '13px', borderRadius: '8px' }}>
                         <span>Syllabus details</span>
                         <ArrowRight size={14} />
@@ -844,7 +886,7 @@ export default function App() {
                 <h3 className="course-title" style={{ fontSize: '18px', fontWeight: '750' }}>{course.title}</h3>
                 <p className="course-desc">{course.description}</p>
                 <div className="course-footer">
-                  <span className="course-price">₹{course.price}</span>
+                  {course.price !== undefined && <span className="course-price">₹{course.price}</span>}
                   <button onClick={() => navigateTo(`#/course/${course.id}`)} className="btn btn-primary" style={{ padding: '10px 20px', fontSize: '13px', borderRadius: '8px' }}>
                     <span>Syllabus details</span>
                     <ArrowRight size={14} />
@@ -1005,10 +1047,10 @@ export default function App() {
           }}>
             <img src={courseDetail.thumbnail} alt={courseDetail.title} style={{ width: '100%', height: '200px', objectFit: 'cover', borderRadius: '14px', marginBottom: '24px', border: '1px solid var(--border-color)' }} />
             
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
+            {courseDetail.price !== undefined && <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
               <span style={{ fontSize: '14.5px', color: 'var(--text-muted)', fontWeight: '550' }}>Package Price:</span>
               <span style={{ fontSize: '32px', fontWeight: '900', color: 'var(--primary-dark)', fontFamily: 'var(--font-title)' }}>₹{courseDetail.price}</span>
-            </div>
+            </div>}
 
             {isEnrolled ? (
               <button onClick={() => navigateTo(`#/dashboard/player/${courseDetail.id}`)} className="btn btn-secondary" style={{ width: '100%', padding: '16px', borderRadius: '12px' }}>
@@ -1376,10 +1418,6 @@ export default function App() {
           
           <div style={{ textAlign: 'center', marginTop: '24px', fontSize: '13.5px', color: 'var(--text-muted)' }}>
             New student? <a href="#/register" onClick={(e) => { e.preventDefault(); navigateTo('#/register'); }} style={{ fontWeight: 'bold', color: 'var(--primary)' }}>Create account</a>
-          </div>
-          <div style={{ textAlign: 'center', marginTop: '14px', fontSize: '11.5px', color: 'var(--text-muted)', backgroundColor: 'hsl(210, 40%, 97%)', padding: '10px', borderRadius: '8px' }}>
-            Demo: student (rahul@gmail.com / student123)<br />
-            Demo: admin (admin@avasthiclasses.com / admin123)
           </div>
         </form>
       </div>
@@ -1920,6 +1958,151 @@ export default function App() {
     setUpgradeMessage('');
   };
 
+  const renderQuizEngine = () => {
+    const quizId = currentPath.split('/')[2];
+    const quiz = quizzesList.find(q => q.id === quizId);
+
+    if (!quiz) {
+      return (
+        <div style={{ padding: '40px', textAlign: 'center' }}>
+          <h2>Quiz not found</h2>
+          <button onClick={() => navigateTo('#/dashboard/quizzes')} className="btn btn-primary">Back to Quizzes</button>
+        </div>
+      );
+    }
+
+    const handleOptionSelect = (qId, optionIdx) => {
+      if (testSubmitted) return;
+      setTestSelectedAnswers(prev => ({ ...prev, [qId]: optionIdx }));
+    };
+
+    const handleSubmit = () => {
+      if (!confirm("Are you sure you want to submit your test?")) return;
+      setTestSubmitted(true);
+    };
+
+    const handleTimerExpire = () => {
+      alert("Time is up! Your test has been submitted automatically.");
+      setTestSubmitted(true);
+    };
+
+    const handleRestart = () => {
+      setTestSelectedAnswers({});
+      setTestSubmitted(false);
+    };
+
+    // Calculate score
+    let score = 0;
+    if (testSubmitted) {
+      quiz.questions?.forEach(q => {
+        if (testSelectedAnswers[q.id] === q.correctOptionIndex) {
+          score++;
+        }
+      });
+    }
+
+    return (
+      <div style={{ padding: '40px 20px', maxWidth: '800px', margin: '0 auto', fontFamily: 'var(--font-body)' }}>
+        <button onClick={() => { handleRestart(); navigateTo('#/dashboard/quizzes'); }} style={{ background: 'none', border: 'none', color: 'var(--primary)', fontWeight: 'bold', cursor: 'pointer', marginBottom: '20px' }}>
+          ← Back to Quizzes
+        </button>
+
+        <div className="glass" style={{ padding: '30px', borderRadius: '16px', backgroundColor: '#fff', border: '1px solid var(--border-color)', marginBottom: '24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <div>
+            <h2 style={{ fontSize: '24px', color: 'var(--primary-dark)', marginBottom: '10px' }}>{quiz.title}</h2>
+            <p style={{ color: 'var(--text-muted)' }}>{quiz.questions?.length || 0} Questions</p>
+          </div>
+          
+          {quiz.durationMinutes && !testSubmitted && (
+            <QuizTimer 
+              durationMinutes={quiz.durationMinutes} 
+              onExpire={handleTimerExpire} 
+              isSubmitted={testSubmitted}
+            />
+          )}
+        </div>
+
+        {testSubmitted && (
+          <div style={{ padding: '20px', borderRadius: '12px', backgroundColor: 'var(--primary-light)', color: 'var(--primary-dark)', marginBottom: '24px', textAlign: 'center', fontWeight: 'bold', fontSize: '20px' }}>
+            Result: {score} / {quiz.questions?.length || 0} ({Math.round((score / (quiz.questions?.length || 1)) * 100)}%)
+          </div>
+        )}
+
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+          {quiz.questions?.map((q, i) => (
+            <div key={q.id} style={{ padding: '24px', borderRadius: '12px', backgroundColor: '#fff', border: '1px solid var(--border-color)' }}>
+              <h3 style={{ fontSize: '16px', marginBottom: '16px', lineHeight: '1.5' }}>
+                <span style={{ color: 'var(--primary)', fontWeight: 'bold', marginRight: '8px' }}>Q{i + 1}.</span> 
+                {q.questionText}
+              </h3>
+              
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                {q.options?.map((opt, optIdx) => {
+                  const isSelected = testSelectedAnswers[q.id] === optIdx;
+                  const isCorrect = testSubmitted && q.correctOptionIndex === optIdx;
+                  const isWrongSelected = testSubmitted && isSelected && !isCorrect;
+
+                  let bgColor = '#f8f9fa';
+                  let borderColor = '#e9ecef';
+                  if (isSelected) { bgColor = '#e0f2fe'; borderColor = '#7dd3fc'; }
+                  if (isCorrect) { bgColor = '#dcfce7'; borderColor = '#86efac'; }
+                  if (isWrongSelected) { bgColor = '#fee2e2'; borderColor = '#fca5a5'; }
+
+                  return (
+                    <div 
+                      key={optIdx}
+                      onClick={() => handleOptionSelect(q.id, optIdx)}
+                      style={{
+                        padding: '12px 16px',
+                        borderRadius: '8px',
+                        border: `2px solid ${borderColor}`,
+                        backgroundColor: bgColor,
+                        cursor: testSubmitted ? 'default' : 'pointer',
+                        transition: 'all 0.2s',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '12px'
+                      }}
+                    >
+                      <div style={{
+                        width: '24px', height: '24px', borderRadius: '50%',
+                        border: `2px solid ${isSelected || isCorrect || isWrongSelected ? 'transparent' : '#cbd5e1'}`,
+                        backgroundColor: isSelected ? 'var(--primary)' : isCorrect ? '#22c55e' : isWrongSelected ? '#ef4444' : '#fff',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        color: '#fff', fontSize: '12px', fontWeight: 'bold'
+                      }}>
+                        {(isCorrect || isSelected || isWrongSelected) ? '✓' : ''}
+                      </div>
+                      <span style={{ fontSize: '14.5px', color: (isCorrect || isWrongSelected || isSelected) ? '#000' : 'var(--text-color)' }}>
+                        {opt}
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <div style={{ marginTop: '30px', display: 'flex', gap: '16px', justifyContent: 'flex-end' }}>
+          {testSubmitted ? (
+            <button onClick={handleRestart} className="btn btn-outline" style={{ padding: '12px 24px', borderRadius: '8px' }}>
+              Retake Test
+            </button>
+          ) : (
+            <button 
+              onClick={handleSubmit} 
+              className="btn btn-primary" 
+              style={{ padding: '12px 24px', borderRadius: '8px' }}
+            >
+              Submit Test
+            </button>
+          )}
+        </div>
+      </div>
+    );
+  };
+
   const renderLmsPlayer = () => {
     if (!playerCourse) return <div className="container" style={{ padding: '80px', textAlignment: 'center' }}>Loading player workspace...</div>;
 
@@ -2355,7 +2538,7 @@ export default function App() {
         formData.append('imageFile', flyerForm.imageFile);
       }
 
-      const res = await fetch('/api/admin/promotions/flyer', {
+      const res = await fetch('/api/admin/flyers', {
         method: 'POST',
         headers: { 'Authorization': `Bearer ${token}` },
         body: formData
@@ -2377,7 +2560,7 @@ export default function App() {
   const handleDeleteFlyer = async (flyerId) => {
     if (!confirm('Are you sure you want to delete this flyer banner?')) return;
     try {
-      const res = await fetch(`/api/admin/promotions/flyer/${flyerId}`, {
+      const res = await fetch(`/api/admin/flyers/${flyerId}`, {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}` }
       });
@@ -2491,6 +2674,7 @@ export default function App() {
     try {
       const formData = new FormData();
       formData.append('pdfFile', pdfFile);
+      if (pdfQuizDuration) formData.append('duration', pdfQuizDuration);
 
       const res = await fetch('/api/admin/parse-quiz-pdf', {
         method: 'POST',
@@ -2793,9 +2977,9 @@ export default function App() {
                 <h4 style={{ fontSize: '16.5px', color: 'var(--primary-dark)', fontWeight: '700' }}>{course.title}</h4>
                 <p style={{ color: 'var(--text-muted)', fontSize: '13.5px', marginTop: '6px', lineHeight: '1.5' }}>{course.description.substr(0,140)}...</p>
                 <div style={{ display: 'flex', gap: '12px', marginTop: '12px' }}>
-                  <span style={{ fontSize: '12px', fontWeight: '800', color: 'var(--secondary)', backgroundColor: 'var(--secondary-bg)', padding: '3px 10px', borderRadius: '20px' }}>
+                  {course.price !== undefined && <span style={{ fontSize: '12px', fontWeight: '800', color: 'var(--secondary)', backgroundColor: 'var(--secondary-bg)', padding: '3px 10px', borderRadius: '20px' }}>
                     Fee: ₹{course.price}
-                  </span>
+                  </span>}
                   <span style={{ fontSize: '12px', fontWeight: '850', color: 'var(--primary)', backgroundColor: 'rgba(26,35,126,0.06)', padding: '3px 10px', borderRadius: '20px' }}>
                     {course.chapterCount || 0} Chapters configured
                   </span>
@@ -3332,9 +3516,14 @@ export default function App() {
           <h3 style={{ fontFamily: 'var(--font-title)', color: 'var(--primary-dark)', fontSize: '20px', fontWeight: '750', marginBottom: '8px' }}>
             ⚡ AI-driven PDF Question Parser
           </h3>
-          <p style={{ fontSize: '13.5px', color: 'var(--text-muted)', marginBottom: '24px', lineHeight: '1.5' }}>
+          <p style={{ fontSize: '13.5px', color: 'var(--text-muted)', marginBottom: '12px', lineHeight: '1.5' }}>
             Upload any question paper PDF (containing MCQs). Our offline mobile parser extracts the questions, options, and dynamically flags correct answers to build an interactive quiz instantly.
           </p>
+          <div style={{ backgroundColor: '#fff3cd', borderLeft: '4px solid #ffc107', padding: '12px', borderRadius: '4px', marginBottom: '24px' }}>
+            <p style={{ margin: 0, fontSize: '13px', color: '#856404', fontWeight: '500' }}>
+              <strong>⚠️ IMPORTANT:</strong> Please ensure you upload a <strong>text-based PDF</strong> (e.g., exported from MS Word). The system cannot read text from scanned images or photos of paper tests.
+            </p>
+          </div>
 
           <form onSubmit={handlePdfQuizSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
             <div style={{
@@ -3361,6 +3550,18 @@ export default function App() {
               <p style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '4px' }}>
                 {pdfFile ? `Size: ${(pdfFile.size / 1024 / 1024).toFixed(2)} MB` : 'Click to browse files or drag and drop here'}
               </p>
+            </div>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+              <label style={{ fontSize: '14px', fontWeight: 'bold', color: 'var(--primary-dark)' }}>Quiz Duration (Minutes)</label>
+              <input 
+                type="number" 
+                className="input-field" 
+                placeholder="Leave blank for no timer" 
+                value={pdfQuizDuration}
+                onChange={(e) => setPdfQuizDuration(e.target.value)}
+                min="1"
+              />
             </div>
 
             {pdfNotice && (
@@ -3479,6 +3680,7 @@ export default function App() {
     if (currentPath === '#/dashboard/payments') return renderDashboardPayments();
     if (currentPath === '#/dashboard/quizzes') return renderDashboardQuizzes();
     if (currentPath.startsWith('#/dashboard/player/')) return renderLmsPlayer();
+    if (currentPath.startsWith('#/test/')) return renderQuizEngine();
 
     // Admin paths
     if (currentPath === '#/admin') return renderAdminStats();

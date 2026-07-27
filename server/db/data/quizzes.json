@@ -1,5 +1,140 @@
 [
   {
+    "id": "q-pdf-6oo1tig7g",
+    "title": "JEE Advanced Set-1_Black Board_Problems Quiz",
+    "sourcePdf": "/uploads/pdfFile-1785157412074-599382535.pdf",
+    "createdAt": "2026-07-27T13:03:32.200Z",
+    "questions": [
+      {
+        "id": "ques-e8rd1mrq5",
+        "questionText": "A charge q is located at the tip of a hollow cone with surface charge density . The slant height of the cone is L, and the half angle at the vertex is (Top half of the cone is removed as shown.) Choose the correct option(s)",
+        "options": [
+          "The magnetic of force on charge ‘q’ due to the cone is",
+          "The magnetic of force on charge ‘q’ due to the cone is",
+          "Force on charge ‘q’ will be maximum for,",
+          "Force on charge ‘q’ will be maximum for,"
+        ],
+        "correctOptionIndex": 0
+      },
+      {
+        "id": "ques-y3q6m5kdo",
+        "questionText": "A cavity is made inside a solid conducting sphere and a charge is placed inside the cavity at the centre. charge is  placed  outside  the  sphere  as  shown  in  the  figure.  Point is  inside  the sphere and point is inside the cavity. Then",
+        "options": [
+          "Electric field at point",
+          "Electric field at point",
+          "Potential at point",
+          "Potential at point"
+        ],
+        "correctOptionIndex": 0
+      },
+      {
+        "id": "ques-j9fnmyock",
+        "questionText": "A soap bubble of radius 'r' and wall thickness 'h' is made in vacuum by blowing an ideal diatomic gas in it. The surface tension of the soap solution is ' ' and density of the soap solution is ' Assume that the heat capacity of the soap film is much greater than that of the gas in the bubble. Then choose the correct option(s). ( ideal gas constant)",
+        "options": [
+          "The molar heat capacity of the gas in the bubble is 4R.",
+          "The molar heat capacity of the gas in the bubble is 3R.",
+          "The time period of small radial oscillations of the soap film is",
+          "The time period of small radial oscillations of the soap film is"
+        ],
+        "correctOptionIndex": 0
+      },
+      {
+        "id": "ques-fvut3ti6h",
+        "questionText": "As shown in the figure a wedge of mass 20 kg is moving rightwards on which a block of mass 10 kg is placed on it. Friction coefficient between the wedge and the block is 0.8. [take g = 10 m/s Select correct alternative(s) among the following options.",
+        "options": [
+          "If wedge is moving with constant velocity then normal force on wedge from the ground is 300N",
+          "If wedge is moving with constant velocity then acceleration of block is zero",
+          "If wedge is moving with",
+          "If wedge is moving with"
+        ],
+        "correctOptionIndex": 0
+      },
+      {
+        "id": "ques-reuhqxtxn",
+        "questionText": "Which of the following overlapping result ungerade molecular orbital?",
+        "options": [
+          "(B)",
+          "(D)"
+        ],
+        "correctOptionIndex": 0
+      },
+      {
+        "id": "ques-kc1zw5mjc",
+        "questionText": "Which of the following comparison(s) represent the correct order of properties indicated against it?",
+        "options": [
+          "P > F > Si (Covalent radii)",
+          "Ne > Ar > He (Electron Gain Enthalpy with sign)",
+          "H > Li > Na (Ionization energy)",
+          "Cl > O > Ne (Electron affinity)"
+        ],
+        "correctOptionIndex": 0
+      },
+      {
+        "id": "ques-kzr9v8ydi",
+        "questionText": "How many of the following reactions produce blue colouration or blue ppt.",
+        "options": [
+          "CuSO₄ solution + NH₃ in excess ⟶",
+          "CuSO₄ solution + K₄[Fe(CN)₆] ⟶",
+          "NiCl₂ solution + Excess NH₃   ⟶",
+          "FeSO₄ solution + K₃[Fe(CN)₆] ⟶"
+        ],
+        "correctOptionIndex": 0
+      },
+      {
+        "id": "ques-mb5l46kz2",
+        "questionText": "Let  3log 2   2log  log10log    log10 where base of logarithm is 10. is divided by 7, we get the remainder R. Which of the following options are correct?",
+        "options": [
+          "R is perfect square of natural number.",
+          "R is prime number.",
+          "R is even number",
+          "R is factor of 20."
+        ],
+        "correctOptionIndex": 0
+      }
+    ]
+  },
+  {
+    "id": "q-pdf-mr8ki0csx",
+    "title": "Flipkart Grid - Previous Year Questions PDF Krishan Kumar Quiz",
+    "sourcePdf": "/uploads/pdfFile-1785156430657-649712878.pdf",
+    "createdAt": "2026-07-27T12:47:10.774Z",
+    "questions": [
+      {
+        "id": "ques-w1i0quxwx",
+        "questionText": "According to the uploaded test document (Flipkart Grid - Previous Year Questions PDF Krishan Kumar Quiz), which statement represents the core conceptual summary?",
+        "options": [
+          "Primary analytical framework",
+          "Empirical observation model",
+          "Historical lineage methodology",
+          "Comparative evaluative structure"
+        ],
+        "correctOptionIndex": 0
+      },
+      {
+        "id": "ques-y6ncteqzs",
+        "questionText": "What is the primary objective of this diagnostic paper?",
+        "options": [
+          "Knowledge assessment and conceptual clarity",
+          "Syllabus revision tracking",
+          "Speed and accuracy training",
+          "All of the above"
+        ],
+        "correctOptionIndex": 3
+      },
+      {
+        "id": "ques-ns28obodc",
+        "questionText": "Which key exam strategy is emphasized in this model paper?",
+        "options": [
+          "Elimination method for MCQs",
+          "Time management per question",
+          "Focusing on high-weightage topics",
+          "Comprehensive revision"
+        ],
+        "correctOptionIndex": 1
+      }
+    ]
+  },
+  {
     "id": "q-rajasthan-geography",
     "title": "Geography of Rajasthan MCQ",
     "questions": [
