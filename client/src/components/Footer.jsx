@@ -38,18 +38,7 @@ export default function Footer({ navigateTo }) {
             gap: '12px',
             marginBottom: '24px'
           }}>
-            <div style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              width: '38px',
-              height: '38px',
-              borderRadius: '10px',
-              background: 'linear-gradient(135deg, var(--secondary) 0%, #ff8f00 100%)'
-            }}>
-              <BookOpen size={18} color="#ffffff" strokeWidth={2.5} />
-            </div>
-            <h3 style={{ color: '#ffffff', fontSize: '21px', fontFamily: 'var(--font-title)', letterSpacing: '-0.01em' }}>AVASTHI CLASSES</h3>
+            <img src="/logo.png" alt="Awasthi Classes Logo" style={{ height: '48px', objectFit: 'contain' }} />
           </div>
           <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: '14.5px', lineHeight: '1.7', fontWeight: '400' }}>
             Empowering aspirants to crack Rajasthan State Competitive Examinations including RAS, REET, Police SI, Patwar & CET. We provide structured lectures, custom PDF notes, and mock exams under expert guidance.

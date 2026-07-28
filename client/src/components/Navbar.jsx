@@ -48,19 +48,7 @@ export default function Navbar({ user, onLogout, currentPath, navigateTo }) {
           color: 'var(--primary-dark)',
           letterSpacing: '-0.02em'
         }}>
-          <div style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            width: '38px',
-            height: '38px',
-            borderRadius: '10px',
-            background: 'linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%)',
-            boxShadow: '0 4px 12px var(--primary-glow)'
-          }}>
-            <BookOpen size={19} color="#ffffff" strokeWidth={2.5} />
-          </div>
-          <span>AVASTHI <span style={{ color: 'var(--secondary)' }}>CLASSES</span></span>
+          <img src="/logo.png" alt="Awasthi Classes Logo" style={{ height: '56px', objectFit: 'contain' }} />
         </a>
 
         {/* Desktop Nav Links */}
