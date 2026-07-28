@@ -24,9 +24,7 @@ export default function Footer({ navigateTo }) {
         pointerEvents: 'none'
       }}></div>
 
-      <div className="container" style={{
-        display: 'grid',
-        gridTemplateColumns: '1.4fr 0.8fr 0.8fr 1.2fr',
+      <div className="container footer-grid" style={{
         gap: '48px',
         marginBottom: '48px',
         position: 'relative',
@@ -113,11 +111,11 @@ export default function Footer({ navigateTo }) {
           <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', fontSize: '14px', color: 'rgba(255,255,255,0.75)' }}>
             <div style={{ display: 'flex', gap: '12px', alignItems: 'flex-start' }}>
               <MapPin size={18} color="var(--secondary)" style={{ flexShrink: 0, marginTop: '2px' }} />
-              <span style={{ lineHeight: '1.4' }}>Mohan Nagar, Station Road, Hindaun City, Rajasthan - 322230</span>
+              <span style={{ lineHeight: '1.4' }}>ICICI Bank ke samne Station Road Hindaun City Karauli - 322230</span>
             </div>
             <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
               <Phone size={18} color="var(--secondary)" style={{ flexShrink: 0 }} />
-              <span>+91 99999 88888</span>
+              <span>+91 7891136255</span>
             </div>
             <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
               <Mail size={18} color="var(--secondary)" style={{ flexShrink: 0 }} />

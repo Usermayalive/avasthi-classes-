@@ -216,28 +216,28 @@ export default function App() {
           title: "How to Crack RAS Prelims: Rajasthan GK Strategy",
           summary: "Rajasthan GK holds around 35-40% weightage in RAS Prelims. Learn the exact topic weightage and reference books to score high.",
           author: "V. K. Avasthi (General Studies)", date: "June 25, 2026",
-          image: "https://images.unsplash.com/photo-1635070041078-e363dbe005cb?auto=format&fit=crop&q=80&w=400"
+          image: ""
         },
         {
           id: "blog2",
           title: "REET Child Pedagogy: Tips for Scoring 30/30",
           summary: "BAAL VIKAS is a core section in REET. Master Piaget, Vygotsky theories and teaching methods to secure full marks.",
           author: "P. Avasthi (Pedagogy Director)", date: "June 28, 2026",
-          image: "https://images.unsplash.com/photo-1434030216411-0b793f4b4173?auto=format&fit=crop&q=80&w=400"
+          image: ""
         },
         {
           id: "blog3",
           title: "Common Eligibility Test (CET) Prep Strategy",
           summary: "Balancing graduation level and 12th level CET. Focus on Computer, English, and Mental Ability topics.",
           author: "R. Sharma (Mental Ability HOD)", date: "June 20, 2026",
-          image: "https://images.unsplash.com/photo-1507668077129-56e32842fceb?auto=format&fit=crop&q=80&w=400"
+          image: ""
         },
         {
           id: "blog4",
           title: "Important Milestones in Rajasthan's Integration",
           summary: "Understand the 7 stages of Rajasthan formation between 1948 and 1956, a must-know topic for all state exams.",
           author: "A. Dwivedi (History Faculty)", date: "June 15, 2026",
-          image: "https://images.unsplash.com/photo-1532094349884-543bc11b234d?auto=format&fit=crop&q=80&w=400"
+          image: ""
         }
       ];
       setBlogs(mockBlogs);
@@ -623,7 +623,7 @@ export default function App() {
               </p>
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '28px' }}>
+            <div className="grid-4col" style={{ display: 'grid', gap: '28px' }}>
               {[
                 { icon: <Video size={28} color="var(--primary)" />, title: 'HD Video Lectures', desc: 'Chapter-wise syllabus explanations by veteran coaching experts, available on-demand.', bg: 'rgba(37,99,235,0.06)' },
                 { icon: <FileCheck size={28} color="var(--secondary)" />, title: 'Revision PDF Notes', desc: 'Downloadable hand-written sheets containing memory tricks, timelines, and summaries.', bg: 'rgba(249,115,22,0.06)' },
@@ -650,7 +650,7 @@ export default function App() {
               <h2 style={{ fontSize: '42px', color: 'var(--primary-dark)', fontFamily: 'var(--font-title)', marginTop: '14px', fontWeight: '800' }}>Your Journey to Selection</h2>
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '48px', maxWidth: '1000px', margin: '0 auto' }}>
+            <div className="grid-3col" style={{ display: 'grid', gap: '48px', maxWidth: '1000px', margin: '0 auto' }}>
               {[
                 { step: '1', title: 'Choose Your Exam Module', desc: 'Select from RAS, REET, SI, Patwar, or CET - each loaded with specialized curriculum.' },
                 { step: '2', title: 'Learn & Test Sandboxes', desc: 'Watch explanations, download revision formula notes, and attempt timed MCQ tests.' },
@@ -717,7 +717,7 @@ export default function App() {
               <p style={{ color: 'var(--text-muted)', fontSize: '17px', marginTop: '12px' }}>Real results logged from previous competitive exam cycles.</p>
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '32px' }}>
+            <div className="grid-3col" style={{ display: 'grid', gap: '32px' }}>
               {[
                 { initials: 'RM', name: 'Rahul Mishra', result: 'RAS 2025 — Rank 42', text: 'The history and geography lecture maps are exceptionally accurate. The handwritten formula sheets let me revise RAS topics efficiently in the last sprint.', color: 'var(--primary)' },
                 { initials: 'SG', name: 'Sneha Gupta', result: 'REET Level 2 — Selected', text: 'Child development and pedagogy notes are a masterpiece. The interactive quiz player gave me immediate grading and analysis reports.', color: '#059669' },
@@ -949,12 +949,7 @@ export default function App() {
 
     return (
       <div className="container" style={{ padding: '80px 28px', animation: 'fadeInUp 0.4s ease' }}>
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: '1.25fr 0.75fr',
-          gap: '48px',
-          alignItems: 'start'
-        }}>
+        <div className="course-detail-layout">
           {/* Left Block - Title & Syllabus Accordion */}
           <div>
             <span style={{ color: 'var(--secondary)', fontWeight: '800', fontSize: '11px', textTransform: 'uppercase', letterSpacing: '2px' }}>SYLLABUS DETAILED SHEET</span>
@@ -1127,7 +1122,7 @@ export default function App() {
           <p style={{ color: 'var(--text-muted)', fontSize: '15.5px', marginTop: '10px' }}>Invest in your academic success. All options include mock sandbox payments.</p>
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.1fr 1fr', gap: '28px', alignItems: 'stretch', maxWidth: '1040px', margin: '0 auto' }}>
+        <div className="pricing-layout" style={{ display: 'grid', gap: '28px', alignItems: 'stretch', maxWidth: '1040px', margin: '0 auto' }}>
           {/* Monthly plan */}
           <div className="glass" style={{ padding: '36px', borderRadius: '20px', display: 'flex', flexDirection: 'column', border: '1px solid var(--border-color)', backgroundColor: '#ffffff', transition: 'transform 0.3s ease, box-shadow 0.3s ease' }}
             onMouseOver={e => { e.currentTarget.style.transform = 'translateY(-4px)'; e.currentTarget.style.boxShadow = 'var(--shadow-lg)'; }}
@@ -1201,15 +1196,17 @@ export default function App() {
       return (
         <div className="container" style={{ padding: '60px 24px', maxWidth: '800px' }}>
           <button onClick={() => setSelectedBlog(null)} className="btn btn-outline" style={{ padding: '6px 14px', fontSize: '12px', borderRadius: '6px', marginBottom: '20px' }}>← Back to Articles</button>
-          <img src={selectedBlog.image} alt={selectedBlog.title} style={{ width: '100%', height: '360px', objectFit: 'cover', borderRadius: '12px', marginBottom: '24px' }} />
-          <div style={{ display: 'flex', gap: '12px', fontSize: '13px', color: 'var(--text-muted)', marginBottom: '12px' }}>
-            <span>By {selectedBlog.author}</span>
-            <span>•</span>
-            <span>{selectedBlog.date}</span>
-          </div>
-          <h2 style={{ fontSize: '32px', color: 'var(--primary-dark)', fontFamily: 'var(--font-title)', marginBottom: '20px', lineHeight: '1.3' }}>{selectedBlog.title}</h2>
-          <div style={{ fontSize: '16px', color: 'var(--text-main)', lineHeight: '1.8', whiteSpace: 'pre-line' }}>
-            {selectedBlog.content || 'Content not seeded.'}
+          <div style={{ backgroundColor: '#ffffff', borderRadius: '16px', padding: '36px', boxShadow: 'var(--shadow-md)', border: '1px solid var(--border-color)', animation: 'fadeInUp 0.4s ease' }}>
+            {selectedBlog.image && <img src={selectedBlog.image} alt={selectedBlog.title} style={{ width: '100%', height: '360px', objectFit: 'cover', borderRadius: '12px', marginBottom: '24px' }} />}
+            <div style={{ display: 'flex', gap: '12px', fontSize: '13px', color: 'var(--text-muted)', marginBottom: '12px' }}>
+              <span>By {selectedBlog.author}</span>
+              <span>•</span>
+              <span>{selectedBlog.date}</span>
+            </div>
+            <h2 style={{ fontSize: '32px', color: 'var(--primary-dark)', fontFamily: 'var(--font-title)', marginBottom: '20px', lineHeight: '1.3' }}>{selectedBlog.title}</h2>
+            <div style={{ fontSize: '16px', color: 'var(--text-main)', lineHeight: '1.8', whiteSpace: 'pre-line' }}>
+              {selectedBlog.content || 'Content not seeded.'}
+            </div>
           </div>
         </div>
       );
@@ -1224,12 +1221,11 @@ export default function App() {
 
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '30px' }}>
           {blogs.map(blog => (
-            <div key={blog.id} className="course-card" style={{ cursor: 'pointer' }} onClick={() => {
-              // Full blog has body content. We find the one seeded inside blogs array or hardcode
+            <div key={blog.id} className="course-card" onClick={() => {
               const fullData = dbBlogsFull[blog.id] || blog;
               setSelectedBlog(fullData);
-            }}>
-              <img src={blog.image} alt={blog.title} className="course-thumb" />
+            }} style={{ cursor: 'pointer', border: '1px solid var(--border-color)', borderRadius: '16px', overflow: 'hidden', backgroundColor: '#ffffff' }}>
+              {blog.image && <img src={blog.image} alt={blog.title} className="course-thumb" />}
               <div className="course-info" style={{ padding: '20px' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '11px', color: 'var(--text-muted)', marginBottom: '8px' }}>
                   <span>{blog.date}</span>
@@ -1256,7 +1252,7 @@ export default function App() {
       title: "How to Crack RAS Prelims: Rajasthan GK Strategy",
       author: "V. K. Avasthi (Senior General Studies Faculty)",
       date: "June 25, 2026",
-      image: "https://images.unsplash.com/photo-1635070041078-e363dbe005cb?auto=format&fit=crop&q=80&w=400",
+      image: "",
       content: "Cracking the RAS (Rajasthan Administrative Services) exam requires a solid grip on Rajasthan General Knowledge (GK). Out of 150 questions in the Prelims paper, about 50-60 questions are directly related to Rajasthan's history, art, culture, geography, polity, and economy.\n\nFocus first on Rajasthan's Art and Culture, as it has the highest consistency in exam questions—memorize major forts, temples, folk deities, and festivals. For geography, map-based study is extremely effective for rivers, minerals, and physical divisions. Keep revising from standard textbooks and take mock tests weekly. Remember, consistency is the key to securing a top rank in state services!"
     },
     blog2: {
@@ -1264,7 +1260,7 @@ export default function App() {
       title: "REET Child Pedagogy: Tips for Scoring 30/30",
       author: "P. Avasthi (CD & Pedagogy Director)",
       date: "June 28, 2026",
-      image: "https://images.unsplash.com/photo-1434030216411-0b793f4b4173?auto=format&fit=crop&q=80&w=400",
+      image: "",
       content: "Baal Vikas (Child Development and Pedagogy) is one of the most scoring sections in the REET exam. To score 30 out of 30, you need to understand the practical application of child development theories.\n\nPay special attention to Piaget's stages of cognitive development, Kohlberg's moral development, and Vygotsky's socio-cultural theory. Practice situational questions where you act as a facilitator in an inclusive classroom. Additionally, ensure you are well-versed in the Right to Education (RTE) Act 2009 and National Curriculum Framework (NCF) 2005, as multiple direct questions are asked from these acts every year."
     },
     blog3: {
@@ -1272,7 +1268,7 @@ export default function App() {
       title: "Common Eligibility Test (CET) Prep Strategy",
       author: "R. Sharma (General Mental Ability HOD)",
       date: "June 20, 2026",
-      image: "https://images.unsplash.com/photo-1507668077129-56e32842fceb?auto=format&fit=crop&q=80&w=400",
+      image: "",
       content: "The Rajasthan CET has become a mandatory qualifying gateway for multiple state services like Junior Accountant, LDC, Patwar, and Police Constable. The syllabus is massive, covering India and Rajasthan history, polity, geography, along with General English, Hindi, Computers, and Mental Ability.\n\nThe best strategy is to first master the core scoring subjects: Mental Ability, Computers, and Hindi/English. These sections have defined syllabi and high accuracy rates. Devote 2 hours daily to Rajasthan GK, focusing on economic surveys and current affairs. Regular practice of mock papers will help you easily clear the qualifying cutoff."
     },
     blog4: {
@@ -1280,7 +1276,7 @@ export default function App() {
       title: "Important Milestones in Rajasthan's Integration",
       author: "A. Dwivedi (History Senior Faculty)",
       date: "June 15, 2026",
-      image: "https://images.unsplash.com/photo-1532094349884-543bc11b234d?auto=format&fit=crop&q=80&w=400",
+      image: "",
       content: "The integration of Rajasthan took place in seven distinct stages from 18 March 1948 to 1 November 1956. This is a highly critical topic for RAS, REET, Patwar, and Constable exams.\n\nYou must memorize the dates of each stage, the princely states merged, the names of prime ministers/chief ministers appointed, and the Rajpramukhs. For example, the Matsya Union was the first stage formed on 18 March 1948, comprising Alwar, Bharatpur, Dholpur, and Karauli. The final state of modern Rajasthan was established on 1 November 1956 under the recommendation of the State Reorganization Commission headed by Fazal Ali. Use timelines and maps to memorize this sequence easily."
     }
   };
@@ -1453,7 +1449,7 @@ export default function App() {
 
     return (
       <div className="container" style={{ padding: '40px 28px' }}>
-        <div style={{ display: 'grid', gridTemplateColumns: '260px 1fr', gap: '36px', alignItems: 'start' }}>
+        <div className="dashboard-layout" style={{ display: 'grid', gap: '36px', alignItems: 'start' }}>
           
           {/* Left Sidebar */}
           <div className="glass" style={{
@@ -2747,7 +2743,7 @@ export default function App() {
 
     return (
       <div className="container" style={{ padding: '40px 28px' }}>
-        <div style={{ display: 'grid', gridTemplateColumns: '260px 1fr', gap: '36px', alignItems: 'start' }}>
+        <div className="dashboard-layout" style={{ display: 'grid', gap: '36px', alignItems: 'start' }}>
           
           {/* Sidebar */}
           <div className="glass" style={{
@@ -3143,7 +3139,7 @@ export default function App() {
               <label className="form-label">Meet / Zoom URL</label>
               <input type="url" className="form-input" placeholder="https://zoom.us/j/999888..." required value={sessionUrl} onChange={e => setSessionUrl(e.target.value)} />
             </div>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+            <div className="grid-2col" style={{ display: 'grid', gap: '16px' }}>
               <div className="form-group">
                 <label className="form-label">Date (e.g. Every Monday)</label>
                 <input type="text" className="form-input" placeholder="Every Monday" required value={sessionDate} onChange={e => setSessionDate(e.target.value)} />
@@ -3207,7 +3203,7 @@ export default function App() {
           </h3>
           
           <form onSubmit={handleCreateFlyerSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px', marginBottom: '28px' }}>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+            <div className="grid-2col" style={{ display: 'grid', gap: '16px' }}>
               <div className="form-group">
                 <label className="form-label">Flyer Title / Headline</label>
                 <input 
@@ -3232,7 +3228,7 @@ export default function App() {
               </div>
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '16px' }}>
+            <div className="grid-3col" style={{ display: 'grid', gap: '16px' }}>
               <div className="form-group">
                 <label className="form-label">Badge Ribbon Tag</label>
                 <input 
@@ -3306,7 +3302,7 @@ export default function App() {
           </h3>
 
           <form onSubmit={handleCreateUpdateSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px', marginBottom: '28px' }}>
-            <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr', gap: '16px' }}>
+            <div className="grid-3col" style={{ display: 'grid', gap: '16px' }}>
               <div className="form-group">
                 <label className="form-label">Notice Headline</label>
                 <input 
@@ -3398,7 +3394,7 @@ export default function App() {
           </h3>
 
           <form onSubmit={handleCreateResultSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px', marginBottom: '28px' }}>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '16px' }}>
+            <div className="grid-3col" style={{ display: 'grid', gap: '16px' }}>
               <div className="form-group">
                 <label className="form-label">Topper Name</label>
                 <input 
@@ -3434,7 +3430,7 @@ export default function App() {
               </div>
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '16px' }}>
+            <div className="grid-3col" style={{ display: 'grid', gap: '16px' }}>
               <div className="form-group">
                 <label className="form-label">Selection Year</label>
                 <input 

@@ -837,3 +837,66 @@ button, input, select, textarea {
   letter-spacing: 0.5px;
   margin-bottom: 8px;
 }
+
+/* Responsive Grid Utility Classes */
+.footer-grid {
+  display: grid;
+  grid-template-columns: 1.4fr 0.8fr 0.8fr 1.2fr;
+}
+
+.dashboard-layout {
+  display: grid;
+  grid-template-columns: 260px 1fr;
+  align-items: start;
+}
+
+.course-detail-layout {
+  display: grid;
+  grid-template-columns: 1.25fr 0.75fr;
+  align-items: start;
+}
+
+.pricing-layout {
+  display: grid;
+  grid-template-columns: 1fr 1.1fr 1fr;
+  align-items: stretch;
+}
+
+.grid-2col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+
+.grid-3col {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+}
+
+.grid-4col {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+}
+
+@media (max-width: 992px) {
+  .dashboard-layout,
+  .course-detail-layout,
+  .footer-grid {
+    grid-template-columns: 1fr;
+    gap: 24px !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .pricing-layout,
+  .grid-2col,
+  .grid-3col,
+  .grid-4col {
+    grid-template-columns: 1fr;
+  }
+  
+  /* Make sure container doesn't overflow */
+  .container {
+    padding: 0 16px !important;
+    overflow-x: hidden;
+  }
+}
