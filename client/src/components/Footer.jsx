@@ -43,7 +43,7 @@ export default function Footer({ navigateTo }) {
           <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: '14.5px', lineHeight: '1.7', fontWeight: '400', marginBottom: '24px' }}>
             Empowering aspirants to crack Rajasthan State Competitive Examinations including RAS, REET, Police SI, Patwar & CET. We provide structured lectures, custom PDF notes, and mock exams under expert guidance.
           </p>
-          <div style={{ display: 'flex', gap: '16px' }}>
+          <div style={{ display: 'flex', gap: '16px', position: 'relative', zIndex: 10 }}>
             <a href="https://www.facebook.com/profile.php?id=100072231400384" target="_blank" rel="noreferrer" style={{ width: '36px', height: '36px', borderRadius: '50%', backgroundColor: 'rgba(255,255,255,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', transition: 'all 0.3s' }} onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--secondary)'} onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.1)'}>
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path></svg>
             </a>
