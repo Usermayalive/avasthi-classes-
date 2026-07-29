@@ -353,8 +353,8 @@ router.post('/parse-quiz-pdf', upload.single('pdfFile'), async (req, res) => {
     for (let i = 0; i < lines.length; i++) {
       const line = lines[i];
 
-      // Question pattern: Q1., 1., Q.1, Question 1:
-      const qMatch = line.match(/^(?:Q|Question|Ques)?\.?\s*\d+\s*[\.\:\-\)]\s*(.+)/i) || line.match(/^\d+\s*[\.\:\-\)]\s*(.+)/i);
+      // Question pattern: Q1., 1., Q.1, Question 1:, प्रश्न 1:, प्र.1
+      const qMatch = line.match(/^(?:Q|Question|Ques|प्रश्न|प्र)?\.?\s*(?:\d+|[०-९]+)\s*[\.\:\-\)]\s*(.+)/i) || line.match(/^(?:\d+|[०-९]+)\s*[\.\:\-\)]\s*(.+)/i);
       if (qMatch) {
         if (curQ && curOpts.length >= 2) {
           questions.push({
@@ -370,30 +370,30 @@ router.post('/parse-quiz-pdf', upload.single('pdfFile'), async (req, res) => {
         continue;
       }
 
-      // Option pattern: (A), A), A., (1), 1)
-      const optMatch = line.match(/^(?:\(?([A-D1-4])[\)\.]\s*|\b([A-D1-4])[\)\.]\s*)(.+)/i);
+      // Option pattern: (A), A), A., (1), 1), (अ), अ), (क)
+      const optMatch = line.match(/^(?:\(?([A-D1-4अबसदकखगघ])[\)\.]\s*|([A-D1-4अबसदकखगघ])[\)\.]\s*)(.+)/i);
       if (optMatch && curQ) {
         curOpts.push(optMatch[3].trim());
         continue;
       }
 
-      // Inline multiple options: (A) Opt1 (B) Opt2
-      if (curQ && (line.includes('(A)') || line.includes('A)') || line.includes('(1)'))) {
-        const parts = line.split(/(?:\([A-D1-4]\)|[A-D1-4][\)\.])/).map(p => p.trim()).filter(Boolean);
+      // Inline multiple options: (A) Opt1 (B) Opt2 or (अ) Opt1 (ब) Opt2
+      if (curQ && (line.includes('(A)') || line.includes('A)') || line.includes('(1)') || line.includes('(अ)') || line.includes('अ)') || line.includes('(क)'))) {
+        const parts = line.split(/(?:\([A-D1-4अबसदकखगघ]\)|[A-D1-4अबसदकखगघ][\)\.])/).map(p => p.trim()).filter(Boolean);
         if (parts.length >= 2) {
           curOpts.push(...parts);
           continue;
         }
       }
 
-      // Parse correct answer line: e.g. Ans: A, Answer: B, Correct Option: C
-      const ansMatch = line.match(/(?:Ans|Answer|Correct)[^A-Za-z0-9]*\b([A-D1-4])\b/i);
+      // Parse correct answer line: e.g. Ans: A, Answer: B, Correct Option: C, उत्तर: अ
+      const ansMatch = line.match(/(?:Ans|Answer|Correct|उत्तर|उ)[^A-Za-z0-9अ-ह]*([A-D1-4अबसदकखगघ])/i);
       if (ansMatch && curQ) {
         const char = ansMatch[1].toUpperCase();
-        if (['A', '1'].includes(char)) curCorrectIdx = 0;
-        else if (['B', '2'].includes(char)) curCorrectIdx = 1;
-        else if (['C', '3'].includes(char)) curCorrectIdx = 2;
-        else if (['D', '4'].includes(char)) curCorrectIdx = 3;
+        if (['A', '1', 'अ', 'क'].includes(char)) curCorrectIdx = 0;
+        else if (['B', '2', 'ब', 'ख'].includes(char)) curCorrectIdx = 1;
+        else if (['C', '3', 'स', 'ग'].includes(char)) curCorrectIdx = 2;
+        else if (['D', '4', 'द', 'घ'].includes(char)) curCorrectIdx = 3;
         continue;
       }
 
