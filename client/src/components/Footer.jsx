@@ -1,5 +1,5 @@
 import React from 'react';
-import { BookOpen, Phone, Mail, MapPin } from 'lucide-react';
+import { BookOpen, Phone, Mail, MapPin, Facebook, Instagram, Youtube, Map } from 'lucide-react';
 
 export default function Footer({ navigateTo }) {
   return (
@@ -40,9 +40,23 @@ export default function Footer({ navigateTo }) {
           }}>
             <img src="/logo.png" alt="Awasthi Classes Logo" style={{ height: '48px', objectFit: 'contain' }} />
           </div>
-          <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: '14.5px', lineHeight: '1.7', fontWeight: '400' }}>
+          <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: '14.5px', lineHeight: '1.7', fontWeight: '400', marginBottom: '24px' }}>
             Empowering aspirants to crack Rajasthan State Competitive Examinations including RAS, REET, Police SI, Patwar & CET. We provide structured lectures, custom PDF notes, and mock exams under expert guidance.
           </p>
+          <div style={{ display: 'flex', gap: '16px' }}>
+            <a href="https://www.facebook.com/profile.php?id=100072231400384" target="_blank" rel="noreferrer" style={{ width: '36px', height: '36px', borderRadius: '50%', backgroundColor: 'rgba(255,255,255,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', transition: 'all 0.3s' }} onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--secondary)'} onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.1)'}>
+              <Facebook size={18} />
+            </a>
+            <a href="https://www.instagram.com/awasthiclasses_hnd/" target="_blank" rel="noreferrer" style={{ width: '36px', height: '36px', borderRadius: '50%', backgroundColor: 'rgba(255,255,255,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', transition: 'all 0.3s' }} onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--secondary)'} onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.1)'}>
+              <Instagram size={18} />
+            </a>
+            <a href="https://www.youtube.com/@awasthiclasseshnd2126" target="_blank" rel="noreferrer" style={{ width: '36px', height: '36px', borderRadius: '50%', backgroundColor: 'rgba(255,255,255,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', transition: 'all 0.3s' }} onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--secondary)'} onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.1)'}>
+              <Youtube size={18} />
+            </a>
+            <a href="https://share.google/VEzs2zSmwkTuHyxsJ" target="_blank" rel="noreferrer" style={{ width: '36px', height: '36px', borderRadius: '50%', backgroundColor: 'rgba(255,255,255,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', transition: 'all 0.3s' }} onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--secondary)'} onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.1)'}>
+              <Map size={18} />
+            </a>
+          </div>
         </div>
 
         {/* Quick Links */}
