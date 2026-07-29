@@ -12,6 +12,7 @@
     "start": "npm run build && node server/server.js"
   },
   "dependencies": {
+    "@anthro-ai/krutidev-unicode": "^0.1.0",
     "bcryptjs": "^2.4.3",
     "concurrently": "^8.2.2",
     "cors": "^2.8.5",

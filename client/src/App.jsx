@@ -90,6 +90,7 @@ export default function App() {
   const [pdfParsing, setPdfParsing] = useState(false);
   const [pdfNotice, setPdfNotice] = useState('');
   const [pdfQuizDuration, setPdfQuizDuration] = useState('');
+  const [pdfIsKrutiDev, setPdfIsKrutiDev] = useState(false);
 
   // Overlay / Pop-up State
   const [paymentCourse, setPaymentCourse] = useState(null);
@@ -2671,6 +2672,7 @@ export default function App() {
       const formData = new FormData();
       formData.append('pdfFile', pdfFile);
       if (pdfQuizDuration) formData.append('duration', pdfQuizDuration);
+      if (pdfIsKrutiDev) formData.append('isKrutiDev', 'true');
 
       const res = await fetch('/api/admin/parse-quiz-pdf', {
         method: 'POST',
@@ -3547,8 +3549,7 @@ export default function App() {
                 {pdfFile ? `Size: ${(pdfFile.size / 1024 / 1024).toFixed(2)} MB` : 'Click to browse files or drag and drop here'}
               </p>
             </div>
-
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginTop: '24px' }}>
               <label style={{ fontSize: '14px', fontWeight: 'bold', color: 'var(--primary-dark)' }}>Quiz Duration (Minutes)</label>
               <input 
                 type="number" 
@@ -3558,6 +3559,17 @@ export default function App() {
                 onChange={(e) => setPdfQuizDuration(e.target.value)}
                 min="1"
               />
+            </div>
+            <div className="form-group" style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '16px', marginBottom: '24px' }}>
+              <input 
+                type="checkbox" 
+                id="krutiDevCheck" 
+                checked={pdfIsKrutiDev}
+                onChange={(e) => setPdfIsKrutiDev(e.target.checked)}
+              />
+              <label htmlFor="krutiDevCheck" style={{ margin: 0, fontWeight: '500', color: 'var(--text-color)' }}>
+                Convert Kruti Dev font to Unicode Hindi (Check this if your PDF is typed in Kruti Dev/DevLys)
+              </label>
             </div>
 
             {pdfNotice && (

@@ -180,6 +180,7 @@ const pdfParse = require('pdf-parse');
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
+const krutidevToUnicode = require('@anthro-ai/krutidev-unicode');
 
 // Configure Multer storage for uploads
 const storage = multer.diskStorage({
@@ -341,6 +342,14 @@ router.post('/parse-quiz-pdf', upload.single('pdfFile'), async (req, res) => {
     // Check if we found any text
     if (!pdfText || !pdfText.trim()) {
       return res.status(400).json({ message: 'No readable text found in the PDF. Please ensure you upload a text-based PDF (like a Word document saved as PDF), and NOT a scanned image.' });
+    }
+
+    if (req.body.isKrutiDev === 'true') {
+      try {
+        pdfText = krutidevToUnicode(pdfText);
+      } catch (err) {
+        console.error('Kruti Dev conversion error:', err);
+      }
     }
 
     // Extract questions & options using regex matching
