@@ -48,7 +48,7 @@ export default function Navbar({ user, onLogout, currentPath, navigateTo }) {
           color: 'var(--primary-dark)',
           letterSpacing: '-0.02em'
         }}>
-          <img src="/logo.png" alt="Awasthi Classes Logo" style={{ height: '56px', objectFit: 'contain' }} />
+          <img src="https://i.postimg.cc/nL43T3Mw/avasthiclasseslogo.jpg" alt="Awasthi Classes Logo" style={{ height: '56px', objectFit: 'contain' }} />
         </a>
 
         {/* Desktop Nav Links */}
