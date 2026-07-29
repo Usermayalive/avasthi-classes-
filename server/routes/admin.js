@@ -352,10 +352,22 @@ router.post('/parse-quiz-pdf', upload.single('pdfFile'), async (req, res) => {
       }
     }
 
+    // Extract Answerkey if it exists at the bottom
+    const ansMap = {};
+    const answerKeyIndex = pdfText.toLowerCase().lastIndexOf('answerkey');
+    if (answerKeyIndex !== -1) {
+      const answerSection = pdfText.slice(answerKeyIndex);
+      const matches = [...answerSection.matchAll(/Q\.?\s*(\d+)\s+([A-D1-4अबसदकखगघ])/gi)];
+      matches.forEach(m => {
+        ansMap[m[1]] = m[2].toUpperCase();
+      });
+    }
+
     // Extract questions & options using regex matching
     let questions = [];
     const lines = pdfText.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
     let curQ = null;
+    let curQNum = null;
     let curOpts = [];
     let curCorrectIdx = 0;
 
@@ -363,7 +375,7 @@ router.post('/parse-quiz-pdf', upload.single('pdfFile'), async (req, res) => {
       const line = lines[i];
 
       // Question pattern: Q1., 1., Q.1, Question 1:, प्रश्न 1:, प्र.1
-      const qMatch = line.match(/^(?:Q|Question|Ques|प्रश्न|प्र)?\.?\s*(?:\d+|[०-९]+)\s*[\.\:\-\)]\s*(.+)/i) || line.match(/^(?:\d+|[०-९]+)\s*[\.\:\-\)]\s*(.+)/i);
+      const qMatch = line.match(/^(?:Q|Question|Ques|प्रश्न|प्र)?\.?\s*(\d+|[०-९]+)\s*[\.\:\-\)]\s*(.+)/i) || line.match(/^(\d+|[०-९]+)\s*[\.\:\-\)]\s*(.+)/i);
       if (qMatch) {
         if (curQ && curOpts.length >= 2) {
           questions.push({
@@ -373,23 +385,27 @@ router.post('/parse-quiz-pdf', upload.single('pdfFile'), async (req, res) => {
             correctOptionIndex: curCorrectIdx
           });
         }
-        curQ = qMatch[1];
+        curQNum = qMatch[1];
+        curQ = qMatch[2];
         curOpts = [];
         curCorrectIdx = 0;
+
+        if (curQNum && ansMap[curQNum]) {
+          const char = ansMap[curQNum];
+          if (['A', '1', 'अ', 'क'].includes(char)) curCorrectIdx = 0;
+          else if (['B', '2', 'ब', 'ख'].includes(char)) curCorrectIdx = 1;
+          else if (['C', '3', 'स', 'ग'].includes(char)) curCorrectIdx = 2;
+          else if (['D', '4', 'द', 'घ'].includes(char)) curCorrectIdx = 3;
+        }
+
         continue;
       }
 
-      // Option pattern: (A), A), A., (1), 1), (अ), अ), (क)
-      const optMatch = line.match(/^(?:\(?([A-D1-4अबसदकखगघ])[\)\.]\s*|([A-D1-4अबसदकखगघ])[\)\.]\s*)(.+)/i);
-      if (optMatch && curQ) {
-        curOpts.push(optMatch[3].trim());
-        continue;
-      }
-
-      // Inline multiple options: (A) Opt1 (B) Opt2 or (अ) Opt1 (ब) Opt2
-      if (curQ && (line.includes('(A)') || line.includes('A)') || line.includes('(1)') || line.includes('(अ)') || line.includes('अ)') || line.includes('(क)'))) {
-        const parts = line.split(/(?:\([A-D1-4अबसदकखगघ]\)|[A-D1-4अबसदकखगघ][\)\.])/).map(p => p.trim()).filter(Boolean);
-        if (parts.length >= 2) {
+      // Option pattern: (A), (1), (अ), (क) or A), 1), अ), क)
+      const optStartRegex = /^\s*(?:\([A-D1-4अबसदकखगघ]\)|[A-D1-4अबसदकखगघ][\)\.])/i;
+      if (optStartRegex.test(line) && curQ) {
+        const parts = line.split(/(?:\([A-D1-4अबसदकखगघ]\)|[A-D1-4अबसदकखगघ][\)\.])/i).map(p => p.trim()).filter(Boolean);
+        if (parts.length > 0) {
           curOpts.push(...parts);
           continue;
         }
