@@ -126,17 +126,17 @@ export default function Footer({ navigateTo }) {
             </div>
             <div style={{ display: 'flex', gap: '16px', marginTop: '12px', alignItems: 'center' }}>
               {/* Facebook */}
-              <span style={{ cursor: 'pointer', color: 'rgba(255,255,255,0.6)', transition: 'all 0.2s ease' }} onMouseOver={e => e.currentTarget.style.color = '#ffffff'} onMouseOut={e => e.currentTarget.style.color = 'rgba(255,255,255,0.6)'}>
+              <a href="https://www.facebook.com/profile.php?id=100072231400384" target="_blank" rel="noreferrer" style={{ cursor: 'pointer', color: 'rgba(255,255,255,0.6)', transition: 'all 0.2s ease' }} onMouseOver={e => e.currentTarget.style.color = '#ffffff'} onMouseOut={e => e.currentTarget.style.color = 'rgba(255,255,255,0.6)'}>
                 <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24"><path d="M22 12c0-5.52-4.48-10-10-10S2 6.48 2 12c0 4.84 3.44 8.87 8 9.8V15H8v-3h2V9.5C10 7.57 11.57 6 13.5 6H16v3h-2c-.55 0-1 .45-1 1v2h3v3h-3v6.95c4.56-.93 8-4.96 8-9.75z"/></svg>
-              </span>
+              </a>
               {/* Youtube */}
-              <span style={{ cursor: 'pointer', color: 'rgba(255,255,255,0.6)', transition: 'all 0.2s ease' }} onMouseOver={e => e.currentTarget.style.color = '#ffffff'} onMouseOut={e => e.currentTarget.style.color = 'rgba(255,255,255,0.6)'}>
+              <a href="https://www.youtube.com/@awasthiclasseshnd2126" target="_blank" rel="noreferrer" style={{ cursor: 'pointer', color: 'rgba(255,255,255,0.6)', transition: 'all 0.2s ease' }} onMouseOver={e => e.currentTarget.style.color = '#ffffff'} onMouseOut={e => e.currentTarget.style.color = 'rgba(255,255,255,0.6)'}>
                 <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24"><path d="M23.498 6.163a3.003 3.003 0 0 0-2.11-2.108C19.528 3.5 12 3.5 12 3.5s-7.528 0-9.388.555A3.002 3.002 0 0 0 .502 6.163C0 8.028 0 12 0 12s0 3.972.502 5.837a3.003 3.003 0 0 0 2.11 2.108C4.472 20.5 12 20.5 12 20.5s7.528 0 9.388-.555a3.002 3.002 0 0 0 2.11-2.108C24 15.972 24 12 24 12s0-3.972-.502-5.837zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
-              </span>
+              </a>
               {/* Instagram */}
-              <span style={{ cursor: 'pointer', color: 'rgba(255,255,255,0.6)', transition: 'all 0.2s ease' }} onMouseOver={e => e.currentTarget.style.color = '#ffffff'} onMouseOut={e => e.currentTarget.style.color = 'rgba(255,255,255,0.6)'}>
+              <a href="https://www.instagram.com/awasthiclasses_hnd/" target="_blank" rel="noreferrer" style={{ cursor: 'pointer', color: 'rgba(255,255,255,0.6)', transition: 'all 0.2s ease' }} onMouseOver={e => e.currentTarget.style.color = '#ffffff'} onMouseOut={e => e.currentTarget.style.color = 'rgba(255,255,255,0.6)'}>
                 <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
-              </span>
+              </a>
             </div>
           </div>
         </div>
