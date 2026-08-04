@@ -357,7 +357,7 @@ router.post('/parse-quiz-pdf', upload.single('pdfFile'), async (req, res) => {
     const answerKeyIndex = pdfText.toLowerCase().lastIndexOf('answerkey');
     if (answerKeyIndex !== -1) {
       const answerSection = pdfText.slice(answerKeyIndex);
-      const matches = [...answerSection.matchAll(/Q\.?\s*(\d+)\s+([A-D1-4अबसदकखगघ])/gi)];
+      const matches = [...answerSection.matchAll(/Q\.?\s*(\d+)\s+([A-E1-5अबसदयहकखगघच])/gi)];
       matches.forEach(m => {
         ansMap[m[1]] = m[2].toUpperCase();
       });
@@ -374,37 +374,44 @@ router.post('/parse-quiz-pdf', upload.single('pdfFile'), async (req, res) => {
     for (let i = 0; i < lines.length; i++) {
       const line = lines[i];
 
-      // Question pattern: Q1., 1., Q.1, Question 1:, प्रश्न 1:, प्र.1
-      const qMatch = line.match(/^(?:Q|Question|Ques|प्रश्न|प्र)?\.?\s*(\d+|[०-९]+)\s*[\.\:\-\)]\s*(.+)/i) || line.match(/^(\d+|[०-९]+)\s*[\.\:\-\)]\s*(.+)/i);
+      // Question pattern: Q1., 1., Q.1, Question 1:, प्रश्न 1:, प्र.1, फण्1
+      let qMatch = line.match(/^(?:Q|Question|Ques|प्रश्न|प्र|फण्)\.?\s*(\d+|[०-९]+)[\.\:\-\)]?\s*(.+)/i);
+      let isExplicitQ = !!qMatch;
+      if (!qMatch) qMatch = line.match(/^(\d+|[०-९]+)\s*[\.\:\-\)]\s*(.+)/i);
+
       if (qMatch) {
-        if (curQ && curOpts.length >= 2) {
-          questions.push({
-            id: generateId('ques'),
-            questionText: curQ,
-            options: curOpts.slice(0, 4),
-            correctOptionIndex: curCorrectIdx
-          });
-        }
-        curQNum = qMatch[1];
-        curQ = qMatch[2];
-        curOpts = [];
-        curCorrectIdx = 0;
+        // Only treat this as a new question if we have gathered options for the previous question, or if there is no current question, or if it explicitly starts with Q.
+        if (isExplicitQ || !curQ || curOpts.length >= 2) {
+          if (curQ && curOpts.length >= 2) {
+            questions.push({
+              id: generateId('ques'),
+              questionText: curQ,
+              options: curOpts.slice(0, 5),
+              correctOptionIndex: curCorrectIdx
+            });
+          }
+          curQNum = qMatch[1];
+          curQ = qMatch[2];
+          curOpts = [];
+          curCorrectIdx = 0;
 
-        if (curQNum && ansMap[curQNum]) {
-          const char = ansMap[curQNum];
-          if (['A', '1', 'अ', 'क'].includes(char)) curCorrectIdx = 0;
-          else if (['B', '2', 'ब', 'ख'].includes(char)) curCorrectIdx = 1;
-          else if (['C', '3', 'स', 'ग'].includes(char)) curCorrectIdx = 2;
-          else if (['D', '4', 'द', 'घ'].includes(char)) curCorrectIdx = 3;
+          if (curQNum && ansMap[curQNum]) {
+            const char = ansMap[curQNum];
+            if (['A', '1', 'अ', 'क'].includes(char)) curCorrectIdx = 0;
+            else if (['B', '2', 'ब', 'ख'].includes(char)) curCorrectIdx = 1;
+            else if (['C', '3', 'स', 'ग'].includes(char)) curCorrectIdx = 2;
+            else if (['D', '4', 'द', 'घ'].includes(char)) curCorrectIdx = 3;
+            else if (['E', '5', 'य', 'च'].includes(char)) curCorrectIdx = 4;
+          }
+          continue;
         }
-
-        continue;
       }
 
       // Option pattern: (A), (1), (अ), (क) or A), 1), अ), क)
-      const optStartRegex = /^\s*(?:\([A-D1-4अबसदकखगघ]\)|[A-D1-4अबसदकखगघ][\)\.])/i;
+      // STRICT regex to prevent '1. text' inside questions from being parsed as options
+      const optStartRegex = /^\s*(?:\([A-E1-5अबसदयहकखगघच]\)|[A-E1-5अबसदयहकखगघच]\))/i;
       if (optStartRegex.test(line) && curQ) {
-        const parts = line.split(/(?:\([A-D1-4अबसदकखगघ]\)|[A-D1-4अबसदकखगघ][\)\.])/i).map(p => p.trim()).filter(Boolean);
+        const parts = line.split(/(?:\([A-E1-5अबसदयहकखगघच]\)|[A-E1-5अबसदयहकखगघच]\))/i).map(p => p.trim()).filter(Boolean);
         if (parts.length > 0) {
           curOpts.push(...parts);
           continue;
@@ -423,8 +430,8 @@ router.post('/parse-quiz-pdf', upload.single('pdfFile'), async (req, res) => {
       }
 
       // Append line to question text if options not started
-      if (curQ && curOpts.length === 0 && line.length > 3) {
-        curQ += ' ' + line;
+      if (curQ && curOpts.length === 0 && line.length > 1) {
+        curQ += '\n' + line;
       }
     }
 
@@ -432,7 +439,7 @@ router.post('/parse-quiz-pdf', upload.single('pdfFile'), async (req, res) => {
       questions.push({
         id: generateId('ques'),
         questionText: curQ,
-        options: curOpts.slice(0, 4),
+        options: curOpts.slice(0, 5),
         correctOptionIndex: curCorrectIdx
       });
     }
