@@ -354,14 +354,13 @@ router.post('/parse-quiz-pdf', upload.single('pdfFile'), async (req, res) => {
 
     // Extract Answerkey if it exists at the bottom
     const ansMap = {};
-    const answerKeyIndex = pdfText.toLowerCase().lastIndexOf('answerkey');
-    if (answerKeyIndex !== -1) {
-      const answerSection = pdfText.slice(answerKeyIndex);
-      const matches = [...answerSection.matchAll(/Q\.?\s*(\d+)\s+([A-E1-5अबसदयहकखगघच])/gi)];
-      matches.forEach(m => {
-        ansMap[m[1]] = m[2].toUpperCase();
-      });
-    }
+    // The word "Answerkey" might be translated into gibberish by KrutiDev converter, 
+    // so we search the last 4000 characters for the question-answer mapping pattern.
+    const answerSection = pdfText.slice(-4000);
+    const matches = [...answerSection.matchAll(/(?:Q|Question|Ques|प्रश्न|प्र|फण्)\.?\s*(\d+)\s+([A-E1-5अबसदयहकखगघच])/gi)];
+    matches.forEach(m => {
+      ansMap[m[1]] = m[2].toUpperCase();
+    });
 
     // Extract questions & options using regex matching
     let questions = [];
