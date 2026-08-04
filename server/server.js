@@ -36,6 +36,26 @@ app.get('/api/public/promotions', (req, res) => {
   });
 });
 
+// Public Contact Endpoint
+app.post('/api/public/contact', (req, res) => {
+  const { name, email, phone, message } = req.body;
+  if (!name || !email || !message) {
+    return res.status(400).json({ error: 'Name, email, and message are required' });
+  }
+  const newContact = {
+    id: 'contact-' + Date.now(),
+    name,
+    email,
+    phone: phone || '',
+    message,
+    createdAt: new Date().toISOString()
+  };
+  const contacts = db.getContacts();
+  contacts.unshift(newContact);
+  db.saveContacts(contacts);
+  res.status(201).json(newContact);
+});
+
 // API Route Bindings
 app.use('/api/auth', authRoutes);
 app.use('/api/courses', courseRoutes);

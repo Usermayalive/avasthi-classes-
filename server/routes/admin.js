@@ -41,7 +41,7 @@ router.get('/courses', (req, res) => {
 
 // POST /api/admin/courses - Create course
 router.post('/courses', (req, res) => {
-  const { title, description, thumbnail, price } = req.body;
+  const { title, description, thumbnail, price, syllabusLink, priority } = req.body;
   if (!title || price === undefined) {
     return res.status(400).json({ message: 'Title and price are required.' });
   }
@@ -52,6 +52,8 @@ router.post('/courses', (req, res) => {
     description: description || '',
     thumbnail: thumbnail || 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&q=80&w=600',
     price: Number(price),
+    syllabusLink: syllabusLink || '',
+    priority: priority ? Number(priority) : 99,
     chapters: []
   };
 
@@ -389,7 +391,7 @@ router.post('/parse-quiz-pdf', upload.single('pdfFile'), async (req, res) => {
     // The word "Answerkey" might be translated into gibberish by KrutiDev converter, 
     // so we search the last 4000 characters for the question-answer mapping pattern.
     const answerSection = pdfText.slice(-4000);
-    const matches = [...answerSection.matchAll(/(?:Q|Question|Ques|प्रश्न|प्र|फण्)\.?\s*(\d+)\s+([A-E1-5अबसदयहकखगघच])/gi)];
+    const matches = [...answerSection.matchAll(/(?:(?:Q|Question|Ques|प्रश्न|प्र|फण्)\.?\s*)?(\d+|[०-९]+)\s*[\.\-\:]?\s+([A-E1-5अबसदयहकखगघच])/gi)];
     matches.forEach(m => {
       ansMap[m[1]] = m[2].toUpperCase();
     });
@@ -406,9 +408,9 @@ router.post('/parse-quiz-pdf', upload.single('pdfFile'), async (req, res) => {
       const line = lines[i];
 
       // Question pattern: Q1., 1., Q.1, Question 1:, प्रश्न 1:, प्र.1, फण्1
-      let qMatch = line.match(/^(?:Q|Question|Ques|प्रश्न|प्र|फण्)\.?\s*(\d+|[०-९]+)[\.\:\-\)]?\s*(.+)/i);
+      let qMatch = line.match(/^\s*(?:Q|Question|Ques|प्रश्न|प्र|फण्)\.?\s*(\d+|[०-९]+)[\.\:\-\)]?\s*(.+)/i);
       let isExplicitQ = !!qMatch;
-      if (!qMatch) qMatch = line.match(/^(\d+|[०-९]+)\s*[\.\:\-\)]\s*(.+)/i);
+      if (!qMatch) qMatch = line.match(/^\s*(\d+|[०-९]+)\s*[\.\:\-\)]\s*(.+)/i);
 
       if (qMatch) {
         // Only treat this as a new question if we have gathered options for the previous question, or if there is no current question, or if it explicitly starts with Q.
@@ -541,3 +543,8 @@ router.delete('/quizzes/:id', (req, res) => {
 });
 
 module.exports = router;
+
+// GET /api/admin/contacts - Fetch inquiries
+router.get('/contacts', (req, res) => {
+  res.json(db.getContacts());
+});

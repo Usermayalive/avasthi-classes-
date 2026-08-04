@@ -507,6 +507,9 @@ function initializeDatabase() {
     }
   ];
   readJSON('staff.json', defaultStaff);
+
+  // Initialize Contacts
+  readJSON('contacts.json', []);
 }
 
 // Initial Call
@@ -673,5 +676,12 @@ module.exports = {
   },
   saveStaff(staff) {
     return writeJSON('staff.json', staff);
+  },
+
+  getContacts() {
+    return readJSON('contacts.json');
+  },
+  saveContacts(contacts) {
+    return writeJSON('contacts.json', contacts);
   }
 };

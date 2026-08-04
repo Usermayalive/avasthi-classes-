@@ -7,7 +7,7 @@ import {
   Play, Lock, FileText, CheckCircle, HelpCircle, 
   BookOpen, Video, Trash2, Edit3, Plus, UserCheck, 
   DollarSign, GraduationCap, Calendar, ExternalLink, 
-  ArrowRight, Shield, Award, Users, FileCheck, Layers, LogOut
+  ArrowRight, Shield, Award, Users, FileCheck, Layers, LogOut, Mail
 } from 'lucide-react';
 
 const QuizTimer = ({ durationMinutes, onExpire, isSubmitted }) => {
@@ -82,6 +82,7 @@ export default function App() {
   const [inquireSubmitted, setInquireSubmitted] = useState(false);
 
   // Admin Media & Quiz Management States
+  const [adminContacts, setAdminContacts] = useState([]);
   const [adminTab, setAdminTab] = useState('promotional'); // 'promotional', 'pdf_quiz', 'stats', 'courses', 'users'
   const [flyerForm, setFlyerForm] = useState({ title: '', subtitle: '', badge: 'ADMISSIONS OPEN', targetExam: 'RAS', imageUrl: '', imageFile: null });
   const [updateForm, setUpdateForm] = useState({ title: '', category: 'Schedule', date: '', description: '', isNew: true });
@@ -319,7 +320,73 @@ export default function App() {
   /* ========================================================
      PAGES RENDER ROUTES
      ======================================================== */
-  
+  const renderNewsDetail = () => {
+    const newsId = currentPath.replace('#/news/', '');
+    const item = promotions.updates?.find(u => u.id === newsId);
+    if (!item) {
+      return (
+        <div className="container" style={{ padding: '100px 20px', textAlign: 'center' }}>
+          <h2>Notice not found</h2>
+          <button className="btn btn-outline" onClick={() => navigateTo('#/')}>Return Home</button>
+        </div>
+      );
+    }
+    return (
+      <div className="container" style={{ padding: '80px 28px', maxWidth: '800px', animation: 'fadeInUp 0.4s ease' }}>
+        <button onClick={() => navigateTo('#/')} className="btn btn-outline" style={{ marginBottom: '24px' }}>← Back</button>
+        <div className="glass" style={{ padding: '40px', borderRadius: '20px', backgroundColor: '#fff', border: '1px solid var(--border-color)', boxShadow: 'var(--shadow-lg)' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
+            <div className="bulletin-date-card">
+              <div className="day-month">{item.date}</div>
+              <div className="year">{item.year || '2026'}</div>
+            </div>
+            {item.isNew && <span className="new-badge-glow">NEW</span>}
+            <span style={{ fontSize: '12px', fontWeight: '800', backgroundColor: 'rgba(26,35,126,0.06)', color: 'var(--primary)', padding: '4px 12px', borderRadius: '20px' }}>
+              {item.category || 'General'}
+            </span>
+          </div>
+          <h1 style={{ fontSize: '32px', color: 'var(--primary-dark)', fontWeight: '800', marginBottom: '24px', lineHeight: '1.2' }}>{item.title}</h1>
+          <div style={{ fontSize: '16px', color: 'var(--text-muted)', lineHeight: '1.8', whiteSpace: 'pre-wrap' }}>
+            {item.description}
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  const renderTopperDetail = () => {
+    const topperId = currentPath.replace('#/topper/', '');
+    const top = promotions.results?.find(r => r.id === topperId);
+    if (!top) {
+      return (
+        <div className="container" style={{ padding: '100px 20px', textAlign: 'center' }}>
+          <h2>Topper not found</h2>
+          <button className="btn btn-outline" onClick={() => navigateTo('#/')}>Return Home</button>
+        </div>
+      );
+    }
+    return (
+      <div className="container" style={{ padding: '80px 28px', maxWidth: '800px', animation: 'fadeInUp 0.4s ease' }}>
+        <button onClick={() => navigateTo('#/')} className="btn btn-outline" style={{ marginBottom: '24px' }}>← Back</button>
+        <div className="glass" style={{ padding: '40px', borderRadius: '20px', backgroundColor: '#fff', border: '1px solid var(--border-color)', boxShadow: 'var(--shadow-lg)', textAlign: 'center' }}>
+          <img src={top.photoUrl} alt={top.name} style={{ width: '160px', height: '160px', borderRadius: '50%', objectFit: 'cover', border: '4px solid #fff', boxShadow: '0 8px 24px rgba(0,0,0,0.15)', marginBottom: '24px' }} />
+          <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '16px' }}>
+            <span className="rank-badge" style={{ fontSize: '14px', padding: '6px 16px' }}>{top.rank}</span>
+          </div>
+          <h1 style={{ fontSize: '36px', color: 'var(--primary-dark)', fontWeight: '800', marginBottom: '8px' }}>{top.name}</h1>
+          <div style={{ fontSize: '18px', color: 'var(--primary)', fontWeight: '700', marginBottom: '32px' }}>{top.exam} ({top.year})</div>
+          
+          <div style={{ textAlign: 'left', padding: '24px', backgroundColor: 'var(--secondary-light)', borderRadius: '16px', borderLeft: '4px solid var(--secondary)' }}>
+            <span style={{ fontSize: '32px', color: 'var(--secondary)', lineHeight: 0, verticalAlign: 'bottom' }}>"</span>
+            <p style={{ fontSize: '18px', color: 'var(--text-muted)', fontStyle: 'italic', lineHeight: '1.6', margin: 0, paddingLeft: '12px' }}>
+              {top.testimonial}
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   // 1. Homepage (Promotional Portal)
   const renderHome = () => {
     const currentFlyer = promotions.flyers && promotions.flyers.length > 0 
@@ -429,7 +496,7 @@ export default function App() {
                 <div style={{ overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '14px', flexGrow: 1, paddingRight: '4px' }}>
                   {promotions.updates && promotions.updates.length > 0 ? (
                     promotions.updates.map((item) => (
-                      <div key={item.id} className="bulletin-item" style={{ cursor: 'pointer' }} onClick={() => alert(item.title + '\n\n' + item.description)}>
+                      <div key={item.id} className="bulletin-item" style={{ cursor: 'pointer' }} onClick={() => navigateTo('#/news/' + item.id)}>
                         <div className="bulletin-date-card">
                           <div className="day-month">{item.date}</div>
                           <div className="year">{item.year || '2026'}</div>
@@ -566,7 +633,7 @@ export default function App() {
             }}>
               {promotions.results && promotions.results.length > 0 ? (
                 promotions.results.map((top) => (
-                  <div key={top.id} className="topper-card">
+                  <div key={top.id} className="topper-card" style={{ cursor: 'pointer' }} onClick={() => navigateTo('#/topper/' + top.id)}>
                     <img src={top.photoUrl} alt={top.name} className="topper-avatar" />
                     <div>
                       <span className="rank-badge">{top.rank}</span>
@@ -895,7 +962,32 @@ export default function App() {
           </p>
         </div>
 
-        <form onSubmit={e => { e.preventDefault(); alert('Query submitted. Our team will contact you in 24 hours.'); }} className="glass" style={{
+        <form onSubmit={async (e) => { 
+          e.preventDefault(); 
+          const btn = e.target.querySelector('button[type="submit"]');
+          const originalText = btn.innerText;
+          btn.innerText = 'Sending...';
+          btn.disabled = true;
+          try {
+            await fetch('/api/public/contact', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                name: e.target.name.value,
+                email: e.target.email.value,
+                phone: e.target.phone.value,
+                message: e.target.message.value
+              })
+            });
+            alert('Query submitted. Our team will contact you in 24 hours.');
+            e.target.reset();
+          } catch(err) {
+            alert('Failed to submit. Please try again.');
+          } finally {
+            btn.innerText = originalText;
+            btn.disabled = false;
+          }
+        }} className="glass" style={{
           backgroundColor: '#ffffff',
           padding: '40px',
           borderRadius: '20px',
@@ -904,15 +996,19 @@ export default function App() {
         }}>
           <div className="form-group">
             <label className="form-label">Full Name</label>
-            <input type="text" className="form-input" placeholder="Enter name" required />
+            <input type="text" name="name" className="form-input" placeholder="Enter name" required />
           </div>
           <div className="form-group">
             <label className="form-label">Email Address</label>
-            <input type="email" className="form-input" placeholder="name@example.com" required />
+            <input type="email" name="email" className="form-input" placeholder="name@example.com" required />
+          </div>
+          <div className="form-group">
+            <label className="form-label">Phone / Mobile Number</label>
+            <input type="tel" name="phone" className="form-input" placeholder="Enter your contact number" required />
           </div>
           <div className="form-group">
             <label className="form-label">Your Inquiry Message</label>
-            <textarea className="form-input" rows="4" placeholder="How can we help you?" required style={{ resize: 'vertical' }}></textarea>
+            <textarea name="message" className="form-input" rows="4" placeholder="How can we help you?" required style={{ resize: 'vertical' }}></textarea>
           </div>
           <button type="submit" className="btn btn-primary" style={{ width: '100%', padding: '15px', borderRadius: '12px', fontSize: '15px' }}>Send Inquiry Message</button>
         </form>
@@ -1132,6 +1228,14 @@ export default function App() {
                 }} className="btn btn-outline" style={{ width: '100%', padding: '14px', borderRadius: '12px', fontSize: '14.5px', borderWidth: '1.5px' }}>
                   Try Free Chapter 1
                 </button>
+                {courseDetail.syllabusLink && (
+                  <a href={courseDetail.syllabusLink} target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'none' }}>
+                    <button className="btn btn-outline" style={{ width: '100%', padding: '14px', borderRadius: '12px', fontSize: '14.5px', borderWidth: '1.5px', color: 'var(--primary)', borderColor: 'var(--primary)', display: 'flex', justifyContent: 'center', gap: '8px' }}>
+                      <FileText size={18} />
+                      <span>Download Syllabus PDF</span>
+                    </button>
+                  </a>
+                )}
               </div>
             )}
 
@@ -2442,6 +2546,10 @@ export default function App() {
   const [courseFormTitle, setCourseFormTitle] = useState('');
   const [courseFormDesc, setCourseFormDesc] = useState('');
   const [courseFormPrice, setCourseFormPrice] = useState(1999);
+  const [courseFormThumbnail, setCourseFormThumbnail] = useState('');
+  const [courseFormPriority, setCourseFormPriority] = useState(99);
+  const [courseFormSyllabusLink, setCourseFormSyllabusLink] = useState('');
+  const [editingCourseId, setEditingCourseId] = useState(null);
   
   // Doubt Session forms
   const [showSessionForm, setShowSessionForm] = useState(false);
@@ -2477,6 +2585,10 @@ export default function App() {
       const quizRes = await fetch('/api/admin/quizzes', { headers: authHeader });
       if (quizRes.ok) setAdminQuizzes(await quizRes.json());
 
+      // Contacts
+      const contactsRes = await fetch('/api/admin/contacts', { headers: authHeader });
+      if (contactsRes.ok) setAdminContacts(await contactsRes.json());
+
     } catch (e) {
       console.error(e);
     }
@@ -2488,12 +2600,15 @@ export default function App() {
     }
   }, [currentPath, userFilter]);
 
-  // Admin CRUD helper - create course
+  // Admin CRUD helper - create or update course
   const handleCreateCourseSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await fetch('/api/admin/courses', {
-        method: 'POST',
+      const url = editingCourseId ? `/api/admin/courses/${editingCourseId}` : '/api/admin/courses';
+      const method = editingCourseId ? 'PUT' : 'POST';
+      
+      const res = await fetch(url, {
+        method: method,
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
@@ -2501,20 +2616,38 @@ export default function App() {
         body: JSON.stringify({
           title: courseFormTitle,
           description: courseFormDesc,
-          price: Number(courseFormPrice)
+          price: Number(courseFormPrice),
+          thumbnail: courseFormThumbnail,
+          priority: Number(courseFormPriority),
+          syllabusLink: courseFormSyllabusLink
         })
       });
       if (res.ok) {
-        alert('New course created successfully! Fetching catalog...');
+        alert(editingCourseId ? 'Course updated successfully!' : 'New course created successfully!');
         setShowCourseForm(false);
+        setEditingCourseId(null);
         setCourseFormTitle('');
         setCourseFormDesc('');
+        setCourseFormThumbnail('');
+        setCourseFormPriority(99);
+        setCourseFormSyllabusLink('');
         fetchCourses(); // refresh public courses list
         loadAdminWorkspace(); // refresh admin view
       }
     } catch (err) {
       console.error(err);
     }
+  };
+
+  const openCourseEdit = (course) => {
+    setEditingCourseId(course.id);
+    setCourseFormTitle(course.title || '');
+    setCourseFormDesc(course.description || '');
+    setCourseFormPrice(course.price || 0);
+    setCourseFormThumbnail(course.thumbnail || '');
+    setCourseFormPriority(course.priority || 99);
+    setCourseFormSyllabusLink(course.syllabusLink || '');
+    setShowCourseForm(true);
   };
 
   // Admin CRUD helper - delete course
@@ -2893,6 +3026,7 @@ export default function App() {
             </div>
 
             <AdminSidebarBtn tab="stats" icon={<Layers size={16} />} label="General Stats" onClick={() => navigateTo('#/admin')} />
+            <AdminSidebarBtn tab="contacts" icon={<Mail size={16} />} label="Inquiries & Leads" onClick={() => navigateTo('#/admin/contacts')} />
             <AdminSidebarBtn tab="promotions" icon={<Edit3 size={16} />} label="Flyers & Bulletins" onClick={() => navigateTo('#/admin/promotions')} />
             <AdminSidebarBtn tab="pdf_quiz" icon={<FileText size={16} />} label="AI PDF Quiz Parser" onClick={() => navigateTo('#/admin/pdf-quiz')} />
             <AdminSidebarBtn tab="courses" icon={<BookOpen size={16} />} label="Syllabus Builder" onClick={() => navigateTo('#/admin/courses')} />
@@ -2918,6 +3052,45 @@ export default function App() {
 
         </div>
       </div>
+    );
+  };
+
+  // Admin Contacts View
+  const renderAdminContacts = () => {
+    return renderAdminLayout(
+      <div style={{ animation: 'fadeInUp 0.3s ease' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
+          <div>
+            <h2 style={{ fontSize: '28px', color: 'var(--primary-dark)', fontWeight: '800' }}>Inquiries & Leads</h2>
+            <p style={{ color: 'var(--text-muted)', fontSize: '14px', marginTop: '4px' }}>Manage messages submitted from the Contact Us form.</p>
+          </div>
+        </div>
+
+        <div className="glass" style={{ padding: '24px', borderRadius: '20px', backgroundColor: '#fff', border: '1px solid var(--border-color)' }}>
+          {adminContacts.length === 0 ? (
+            <div style={{ textAlign: 'center', color: 'var(--text-muted)', padding: '40px' }}>No inquiries found.</div>
+          ) : (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+              {adminContacts.map(contact => (
+                <div key={contact.id} style={{ padding: '20px', border: '1px solid var(--border-color)', borderRadius: '12px', backgroundColor: 'var(--secondary-light)' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
+                    <h3 style={{ fontSize: '16px', fontWeight: '700', color: 'var(--primary-dark)' }}>{contact.name}</h3>
+                    <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>{new Date(contact.createdAt).toLocaleString()}</span>
+                  </div>
+                  <div style={{ display: 'flex', gap: '16px', marginBottom: '12px', fontSize: '13px', color: 'var(--primary)' }}>
+                    <span>📧 {contact.email}</span>
+                    <span>📞 {contact.phone || 'N/A'}</span>
+                  </div>
+                  <p style={{ fontSize: '14px', color: 'var(--text-main)', lineHeight: '1.6', backgroundColor: '#fff', padding: '12px', borderRadius: '8px', whiteSpace: 'pre-wrap' }}>
+                    {contact.message}
+                  </p>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>,
+      'contacts'
     );
   };
 
@@ -3039,7 +3212,9 @@ export default function App() {
             marginBottom: '28px',
             boxShadow: 'var(--shadow-md)'
           }}>
-            <h4 style={{ fontFamily: 'var(--font-title)', color: 'var(--primary-dark)', marginBottom: '20px', fontWeight: '750' }}>Create New Competitive Course Package</h4>
+            <h4 style={{ fontFamily: 'var(--font-title)', color: 'var(--primary-dark)', marginBottom: '20px', fontWeight: '750' }}>
+              {editingCourseId ? 'Edit Course Package' : 'Create New Competitive Course Package'}
+            </h4>
             <div className="form-group">
               <label className="form-label">Course Title</label>
               <input type="text" className="form-input" placeholder="RAS General Studies - Full Year" required value={courseFormTitle} onChange={e => setCourseFormTitle(e.target.value)} />
@@ -3048,12 +3223,26 @@ export default function App() {
               <label className="form-label">Short Description</label>
               <textarea className="form-input" rows="3" placeholder="Syllabus overview and curriculum breakdown..." required value={courseFormDesc} onChange={e => setCourseFormDesc(e.target.value)}></textarea>
             </div>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+              <div className="form-group">
+                <label className="form-label">Fee Amount (₹)</label>
+                <input type="number" className="form-input" placeholder="1999" required value={courseFormPrice} onChange={e => setCourseFormPrice(e.target.value)} />
+              </div>
+              <div className="form-group">
+                <label className="form-label">Display Priority (lower = first)</label>
+                <input type="number" className="form-input" placeholder="99" required value={courseFormPriority} onChange={e => setCourseFormPriority(e.target.value)} />
+              </div>
+            </div>
             <div className="form-group">
-              <label className="form-label">Fee Amount (₹)</label>
-              <input type="number" className="form-input" placeholder="1999" required value={courseFormPrice} onChange={e => setCourseFormPrice(e.target.value)} />
+              <label className="form-label">Syllabus PDF Link (Direct URL)</label>
+              <input type="url" className="form-input" placeholder="https://..." value={courseFormSyllabusLink} onChange={e => setCourseFormSyllabusLink(e.target.value)} />
+            </div>
+            <div className="form-group">
+              <label className="form-label">Thumbnail Image URL</label>
+              <input type="url" className="form-input" placeholder="https://..." value={courseFormThumbnail} onChange={e => setCourseFormThumbnail(e.target.value)} />
             </div>
             <div style={{ display: 'flex', gap: '12px', marginTop: '24px' }}>
-              <button type="button" onClick={() => setShowCourseForm(false)} className="btn btn-outline" style={{ padding: '10px 20px', fontSize: '13.5px', borderRadius: '10px' }}>Cancel</button>
+              <button type="button" onClick={() => { setShowCourseForm(false); setEditingCourseId(null); }} className="btn btn-outline" style={{ padding: '10px 20px', fontSize: '13.5px', borderRadius: '10px' }}>Cancel</button>
               <button type="submit" className="btn btn-secondary" style={{ padding: '10px 24px', fontSize: '13.5px', borderRadius: '10px' }}>Save Course Package</button>
             </div>
           </form>
@@ -3088,10 +3277,13 @@ export default function App() {
                 <button onClick={() => navigateTo(`#/course/${course.id}`)} className="btn btn-outline" style={{ padding: '8px 16px', fontSize: '12.5px', borderRadius: '8px' }}>
                   Syllabus details
                 </button>
-                <button onClick={() => handleDeleteCourse(course.id)} className="btn" style={{
-                  padding: '10px', borderRadius: '10px', border: '1px solid #fee2e2', backgroundColor: '#fef2f2', color: '#ef4444', boxShadow: 'none', display: 'flex', alignItems: 'center'
-                }}>
-                  <Trash2 size={15} />
+                <button onClick={() => openCourseEdit(course)} className="btn btn-outline" style={{ padding: '8px 12px', color: 'var(--primary)', borderColor: 'var(--primary)' }}>
+                  <Edit3 size={16} />
+                  <span>Edit</span>
+                </button>
+                <button onClick={() => handleDeleteCourse(course.id)} className="btn btn-outline" style={{ padding: '8px 12px', color: '#ef4444', borderColor: '#fee2e2', backgroundColor: '#fef2f2' }}>
+                  <Trash2 size={16} />
+                  <span>Delete</span>
                 </button>
               </div>
             </div>
@@ -3852,6 +4044,8 @@ export default function App() {
     if (currentPath === '#/dashboard/quizzes') return renderDashboardQuizzes();
     if (currentPath.startsWith('#/dashboard/player/')) return renderLmsPlayer();
     if (currentPath.startsWith('#/test/')) return renderQuizEngine();
+    if (currentPath.startsWith('#/news/')) return renderNewsDetail();
+    if (currentPath.startsWith('#/topper/')) return renderTopperDetail();
 
     // Admin paths
     if (currentPath === '#/admin') return renderAdminStats();
@@ -3861,6 +4055,7 @@ export default function App() {
     if (currentPath === '#/admin/sessions') return renderAdminSessions();
     if (currentPath === '#/admin/promotions') return renderAdminPromotions();
     if (currentPath === '#/admin/pdf-quiz') return renderAdminPdfQuiz();
+    if (currentPath === '#/admin/contacts') return renderAdminContacts();
 
     // Catch all fallback
     return renderHome();

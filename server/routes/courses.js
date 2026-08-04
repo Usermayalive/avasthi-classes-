@@ -22,9 +22,12 @@ router.get('/', (req, res) => {
     description: c.description,
     thumbnail: c.thumbnail,
     price: c.price,
+    priority: c.priority !== undefined ? c.priority : 99,
     chapterCount: c.chapters.length,
     lessonCount: c.chapters.reduce((sum, ch) => sum + ch.lessons.length, 0)
   }));
+  
+  simplified.sort((a, b) => a.priority - b.priority);
   res.json(simplified);
 });
 
