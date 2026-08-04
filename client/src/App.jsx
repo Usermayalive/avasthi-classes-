@@ -86,6 +86,7 @@ export default function App() {
   const [flyerForm, setFlyerForm] = useState({ title: '', subtitle: '', badge: 'ADMISSIONS OPEN', targetExam: 'RAS', imageUrl: '', imageFile: null });
   const [updateForm, setUpdateForm] = useState({ title: '', category: 'Schedule', date: '', description: '', isNew: true });
   const [resultForm, setResultForm] = useState({ name: '', exam: 'RAS Exam 2024', rank: 'Rank 01', year: '2024', photoUrl: '', testimonial: '', photoFile: null });
+  const [staffForm, setStaffForm] = useState({ name: '', designation: '', photoUrl: '' });
   const [pdfFile, setPdfFile] = useState(null);
   const [pdfParsing, setPdfParsing] = useState(false);
   const [pdfNotice, setPdfNotice] = useState('');
@@ -708,6 +709,63 @@ export default function App() {
             </div>
           </div>
         </section>
+
+        {/* ========== STAFF DETAILS ========== */}
+        {promotions.staff && promotions.staff.length > 0 && (
+          <section style={{ padding: '90px 0', backgroundColor: '#f8fafc', borderTop: '1px solid var(--border-color)' }}>
+            <div className="container">
+              <div style={{ textAlign: 'center', marginBottom: '60px' }}>
+                <span style={{ color: 'var(--secondary)', fontWeight: '800', fontSize: '12px', textTransform: 'uppercase', letterSpacing: '2.5px' }}>OUR EXPERT FACULTY</span>
+                <h2 style={{ fontSize: '42px', color: 'var(--primary-dark)', fontFamily: 'var(--font-title)', marginTop: '14px', fontWeight: '800' }}>Faculty & Staff Directory</h2>
+                <p style={{ color: 'var(--text-muted)', fontSize: '17px', marginTop: '12px' }}>Learn from Rajasthan's most experienced educators and subject matter experts.</p>
+              </div>
+
+              <div style={{ 
+                display: 'grid', 
+                gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', 
+                gap: '32px',
+                justifyContent: 'center'
+              }}>
+                {promotions.staff.map((member, i) => (
+                  <div key={member.id || i} style={{
+                    backgroundColor: '#ffffff',
+                    borderRadius: '24px',
+                    padding: '36px 24px',
+                    textAlign: 'center',
+                    border: '1px solid var(--border-color)',
+                    boxShadow: 'var(--shadow-sm)',
+                    transition: 'transform 0.3s ease, box-shadow 0.3s ease',
+                    cursor: 'default'
+                  }}
+                  onMouseOver={e => { e.currentTarget.style.transform = 'translateY(-6px)'; e.currentTarget.style.boxShadow = 'var(--shadow-md)'; }}
+                  onMouseOut={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = 'var(--shadow-sm)'; }}
+                  >
+                    <div style={{
+                      width: '120px',
+                      height: '120px',
+                      borderRadius: '50%',
+                      margin: '0 auto 24px auto',
+                      padding: '4px',
+                      backgroundColor: '#ffffff',
+                      border: '3px solid var(--primary-light)',
+                      overflow: 'hidden'
+                    }}>
+                      <img 
+                        src={member.photoUrl} 
+                        alt={member.name} 
+                        style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }} 
+                      />
+                    </div>
+                    <h3 style={{ fontSize: '20px', fontWeight: '800', color: 'var(--primary-dark)', fontFamily: 'var(--font-title)' }}>{member.name}</h3>
+                    <div style={{ fontSize: '14px', color: 'var(--secondary)', fontWeight: '600', marginTop: '8px', padding: '6px 12px', backgroundColor: 'var(--secondary-light)', borderRadius: '20px', display: 'inline-block' }}>
+                      {member.designation}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </section>
+        )}
 
         {/* ========== TESTIMONIALS ========== */}
         <section style={{ padding: '120px 0', backgroundColor: '#ffffff', borderTop: '1px solid var(--border-color)' }}>
@@ -2659,6 +2717,48 @@ export default function App() {
     }
   };
 
+  // Admin CRM helper - create staff details
+  const handleCreateStaffSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const res = await fetch('/api/admin/promotions/staff', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(staffForm)
+      });
+      if (res.ok) {
+        alert('Staff record saved successfully!');
+        setStaffForm({ name: '', designation: '', photoUrl: '' });
+        fetchPromotions();
+      } else {
+        const err = await res.json();
+        alert('Error saving staff: ' + err.message);
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  // Admin CRM helper - delete staff details
+  const handleDeleteStaff = async (staffId) => {
+    if (!confirm('Are you sure you want to delete this staff member?')) return;
+    try {
+      const res = await fetch(`/api/admin/promotions/staff/${staffId}`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (res.ok) {
+        fetchPromotions();
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+
   // Admin CRM helper - submit PDF to parse as Quiz
   const handlePdfQuizSubmit = async (e) => {
     e.preventDefault();
@@ -3492,6 +3592,69 @@ export default function App() {
                   <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>{top.exam} ({top.year})</div>
                 </div>
                 <button onClick={() => handleDeleteResult(top.id)} className="btn btn-outline" style={{ color: '#dc2626', borderColor: '#fecaca', padding: '6px 10px', fontSize: '11px', borderRadius: '6px' }}>
+                  Delete
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* SECTION 4: STAFF MANAGER */}
+        <div className="glass" style={{ backgroundColor: '#ffffff', padding: '28px', borderRadius: '16px', border: '1px solid var(--border-color)', boxShadow: 'var(--shadow-sm)' }}>
+          <h3 style={{ fontFamily: 'var(--font-title)', color: 'var(--primary-dark)', fontSize: '18px', fontWeight: '750', marginBottom: '20px', borderBottom: '1px solid var(--border-color)', paddingBottom: '10px' }}>
+            👨‍🏫 Faculty & Staff Directory
+          </h3>
+          
+          <form onSubmit={handleCreateStaffSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px', marginBottom: '28px' }}>
+            <div className="grid-3col" style={{ display: 'grid', gap: '16px' }}>
+              <div className="form-group">
+                <label className="form-label">Full Name</label>
+                <input 
+                  type="text" 
+                  className="form-input" 
+                  placeholder="e.g. V. K. Avasthi" 
+                  required 
+                  value={staffForm.name} 
+                  onChange={e => setStaffForm({ ...staffForm, name: e.target.value })} 
+                />
+              </div>
+              <div className="form-group">
+                <label className="form-label">Designation / Subject</label>
+                <input 
+                  type="text" 
+                  className="form-input" 
+                  placeholder="e.g. Senior Faculty (History)" 
+                  required 
+                  value={staffForm.designation} 
+                  onChange={e => setStaffForm({ ...staffForm, designation: e.target.value })} 
+                />
+              </div>
+              <div className="form-group">
+                <label className="form-label">Photo Image URL</label>
+                <input 
+                  type="url" 
+                  className="form-input" 
+                  placeholder="https://..." 
+                  required 
+                  value={staffForm.photoUrl} 
+                  onChange={e => setStaffForm({ ...staffForm, photoUrl: e.target.value })} 
+                />
+              </div>
+            </div>
+            <button type="submit" className="btn btn-primary" style={{ alignSelf: 'flex-start' }}>
+              <Plus size={16} /> Add Staff Member
+            </button>
+          </form>
+
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '16px' }}>
+            {promotions.staff && promotions.staff.map(member => (
+              <div key={member.id} style={{ display: 'flex', gap: '16px', padding: '16px', border: '1px solid var(--border-color)', borderRadius: '12px', alignItems: 'center', backgroundColor: '#fafafa' }}>
+                <img src={member.photoUrl} alt={member.name} style={{ width: '60px', height: '60px', borderRadius: '50%', objectFit: 'cover', border: '2px solid #e2e8f0' }} />
+                <div style={{ flexGrow: 1 }}>
+                  <h4 style={{ fontSize: '15px', fontWeight: '750', color: 'var(--primary-dark)' }}>{member.name}</h4>
+                  <div style={{ fontSize: '12.5px', color: 'var(--text-muted)' }}>{member.designation}</div>
+                </div>
+                <button onClick={() => handleDeleteStaff(member.id)} className="btn btn-outline" style={{ color: '#dc2626', borderColor: '#fecaca', padding: '6px 10px', fontSize: '11px', borderRadius: '6px' }}>
                   Delete
                 </button>
               </div>

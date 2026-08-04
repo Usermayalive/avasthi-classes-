@@ -26,12 +26,13 @@ if (!fs.existsSync(UPLOADS_DIR)) {
 }
 app.use('/uploads', express.static(UPLOADS_DIR));
 
-// Public Promotions Endpoint (Flyers, Bulletins, Toppers)
+// Public Promotions Endpoint (Flyers, Bulletins, Toppers, Staff)
 app.get('/api/public/promotions', (req, res) => {
   res.json({
     flyers: db.getFlyers(),
     updates: db.getUpdates(),
-    results: db.getResults()
+    results: db.getResults(),
+    staff: db.getStaff()
   });
 });
 

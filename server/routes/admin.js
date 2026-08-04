@@ -208,7 +208,8 @@ router.get('/promotions', (req, res) => {
   res.json({
     flyers: db.getFlyers(),
     updates: db.getUpdates(),
-    results: db.getResults()
+    results: db.getResults(),
+    staff: db.getStaff()
   });
 });
 
@@ -313,12 +314,43 @@ router.post('/results', upload.single('photoFile'), (req, res) => {
   res.status(201).json(newResult);
 });
 
-// DELETE /api/admin/results/:id - Delete Topper Record
-router.delete('/results/:id', (req, res) => {
+// DELETE /api/admin/promotions/result/:id - Delete Topper Result
+router.delete('/promotions/result/:id', (req, res) => {
   const results = db.getResults();
   const filtered = results.filter(r => r.id !== req.params.id);
   db.saveResults(filtered);
-  res.json({ message: 'Topper record deleted.' });
+  res.json({ message: 'Result deleted successfully' });
+});
+
+// POST /api/admin/promotions/staff - Add Staff Details
+router.post('/promotions/staff', (req, res) => {
+  const { name, designation, photoUrl } = req.body;
+
+  if (!name || !designation || !photoUrl) {
+    return res.status(400).json({ message: 'Name, Designation, and Photo URL are required.' });
+  }
+
+  const newStaff = {
+    id: generateId('staff'),
+    name,
+    designation,
+    photoUrl,
+    createdAt: new Date().toISOString()
+  };
+
+  const staff = db.getStaff();
+  staff.push(newStaff);
+  db.saveStaff(staff);
+
+  res.status(201).json(newStaff);
+});
+
+// DELETE /api/admin/promotions/staff/:id - Delete Staff Member
+router.delete('/promotions/staff/:id', (req, res) => {
+  const staff = db.getStaff();
+  const filtered = staff.filter(s => s.id !== req.params.id);
+  db.saveStaff(filtered);
+  res.json({ message: 'Staff deleted successfully' });
 });
 
 // POST /api/admin/parse-quiz-pdf - Ingest PDF Question Paper and auto-generate Quiz

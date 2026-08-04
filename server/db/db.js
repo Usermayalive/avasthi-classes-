@@ -485,6 +485,28 @@ function initializeDatabase() {
     }
   ];
   readJSON('results.json', defaultResults);
+
+  const defaultStaff = [
+    {
+      id: "staff-1",
+      name: "V. K. Avasthi",
+      designation: "Director & Senior Faculty (History)",
+      photoUrl: "https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&q=80&w=400"
+    },
+    {
+      id: "staff-2",
+      name: "P. Avasthi",
+      designation: "HOD - Child Development & Pedagogy",
+      photoUrl: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&q=80&w=400"
+    },
+    {
+      id: "staff-3",
+      name: "R. Sharma",
+      designation: "Senior Faculty (Mental Ability)",
+      photoUrl: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&q=80&w=400"
+    }
+  ];
+  readJSON('staff.json', defaultStaff);
 }
 
 // Initial Call
@@ -644,5 +666,12 @@ module.exports = {
   },
   saveResults(results) {
     return writeJSON('results.json', results);
+  },
+
+  getStaff() {
+    return readJSON('staff.json');
+  },
+  saveStaff(staff) {
+    return writeJSON('staff.json', staff);
   }
 };
